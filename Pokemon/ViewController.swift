@@ -55,10 +55,6 @@ class ViewController: UITableViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         title = "Pokemon"
-        tableView.register(
-            UITableViewCell.self,
-            forCellReuseIdentifier: "PokemonCell"
-        )
         loadPokemon()
     }
 
