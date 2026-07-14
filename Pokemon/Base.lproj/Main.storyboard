@@ -50,42 +50,44 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="image-001">
-                                <rect key="frame" x="96.666666666666686" y="124" width="200" height="200"/>
+                                <rect key="frame" x="0.0" y="124" width="393" height="393"/>
                                 <constraints>
-                                    <constraint firstAttribute="width" constant="200" id="image-width-001"/>
-                                    <constraint firstAttribute="height" constant="200" id="image-height-001"/>
+                                    <constraint firstAttribute="height" secondItem="image-001" secondAttribute="width" multiplier="1:1" id="image-aspect-001"/>
                                 </constraints>
                             </imageView>
-                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Pokemon" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontForContentSizeCategory="YES" translatesAutoresizingMaskIntoConstraints="NO" id="name-001">
-                                <rect key="frame" x="24" y="348" width="345" height="34"/>
-                                <fontDescription key="fontDescription" style="UICTFontTextStyleTitle1"/>
-                                <nil key="textColor"/>
-                                <nil key="highlightedColor"/>
-                            </label>
-                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Types" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontForContentSizeCategory="YES" translatesAutoresizingMaskIntoConstraints="NO" id="types-001">
-                                <rect key="frame" x="24" y="398" width="345" height="24"/>
-                                <fontDescription key="fontDescription" style="UICTFontTextStyleTitle3"/>
-                                <color key="textColor" systemColor="secondaryLabelColor"/>
-                                <nil key="highlightedColor"/>
-                            </label>
+                            <stackView opaque="NO" contentMode="scaleToFill" axis="horizontal" alignment="center" spacing="8" translatesAutoresizingMaskIntoConstraints="NO" id="type-row-001">
+                                <rect key="frame" x="146" y="398" width="101" height="24"/>
+                                <subviews>
+                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Type:" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontForContentSizeCategory="YES" translatesAutoresizingMaskIntoConstraints="NO" id="type-title-001">
+                                        <rect key="frame" x="0.0" y="0.0" width="50" height="24"/>
+                                        <fontDescription key="fontDescription" style="UICTFontTextStyleTitle3"/>
+                                        <nil key="textColor"/>
+                                        <nil key="highlightedColor"/>
+                                    </label>
+                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Types" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontForContentSizeCategory="YES" translatesAutoresizingMaskIntoConstraints="NO" id="types-001">
+                                        <rect key="frame" x="58" y="0.0" width="43" height="24"/>
+                                        <fontDescription key="fontDescription" style="UICTFontTextStyleTitle3"/>
+                                        <color key="textColor" systemColor="secondaryLabelColor"/>
+                                        <nil key="highlightedColor"/>
+                                    </label>
+                                </subviews>
+                            </stackView>
                         </subviews>
                         <viewLayoutGuide key="safeArea" id="safe-detail-001"/>
                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                         <constraints>
                             <constraint firstItem="image-001" firstAttribute="top" secondItem="safe-detail-001" secondAttribute="top" constant="24" id="image-top-001"/>
-                            <constraint firstItem="image-001" firstAttribute="centerX" secondItem="safe-detail-001" secondAttribute="centerX" id="image-center-001"/>
-                            <constraint firstItem="name-001" firstAttribute="top" secondItem="image-001" secondAttribute="bottom" constant="24" id="name-top-001"/>
-                            <constraint firstItem="name-001" firstAttribute="leading" secondItem="safe-detail-001" secondAttribute="leading" constant="24" id="name-leading-001"/>
-                            <constraint firstItem="safe-detail-001" firstAttribute="trailing" secondItem="name-001" secondAttribute="trailing" constant="24" id="name-trailing-001"/>
-                            <constraint firstItem="types-001" firstAttribute="top" secondItem="name-001" secondAttribute="bottom" constant="16" id="types-top-001"/>
-                            <constraint firstItem="types-001" firstAttribute="leading" secondItem="safe-detail-001" secondAttribute="leading" constant="24" id="types-leading-001"/>
-                            <constraint firstItem="safe-detail-001" firstAttribute="trailing" secondItem="types-001" secondAttribute="trailing" constant="24" id="types-trailing-001"/>
+                            <constraint firstItem="image-001" firstAttribute="leading" secondItem="safe-detail-001" secondAttribute="leading" id="image-leading-001"/>
+                            <constraint firstItem="safe-detail-001" firstAttribute="trailing" secondItem="image-001" secondAttribute="trailing" id="image-trailing-001"/>
+                            <constraint firstItem="type-row-001" firstAttribute="top" secondItem="image-001" secondAttribute="bottom" constant="24" id="type-row-top-001"/>
+                            <constraint firstItem="type-row-001" firstAttribute="centerX" secondItem="safe-detail-001" secondAttribute="centerX" id="type-row-center-001"/>
+                            <constraint firstItem="type-row-001" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="safe-detail-001" secondAttribute="leading" constant="24" id="type-row-leading-001"/>
+                            <constraint firstItem="safe-detail-001" firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="type-row-001" secondAttribute="trailing" constant="24" id="type-row-trailing-001"/>
                         </constraints>
                     </view>
                     <navigationItem key="navigationItem" title="Pokemon Detail" id="nav-item-detail"/>
                     <connections>
                         <outlet property="imageView" destination="image-001" id="outlet-image-001"/>
-                        <outlet property="nameLabel" destination="name-001" id="outlet-name-001"/>
                         <outlet property="typesLabel" destination="types-001" id="outlet-types-001"/>
                     </connections>
                 </viewController>

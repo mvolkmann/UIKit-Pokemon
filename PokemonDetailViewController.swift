@@ -2,7 +2,6 @@ import UIKit
 
 class PokemonDetailViewController: UIViewController {
     @IBOutlet private var imageView: UIImageView!
-    @IBOutlet private var nameLabel: UILabel!
     @IBOutlet private var typesLabel: UILabel!
 
     var pokemon: Pokemon?
@@ -16,7 +15,6 @@ class PokemonDetailViewController: UIViewController {
         guard let pokemon else { return }
 
         title = pokemon.displayName
-        nameLabel.text = pokemon.displayName
         typesLabel.text = pokemon.typeNames.joined(separator: ", ")
         imageView.image = UIImage(systemName: "photo")
         imageView.tintColor = .secondaryLabel
