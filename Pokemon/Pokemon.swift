@@ -14,7 +14,7 @@ struct PokemonResponse: Decodable {
 struct Pokemon: Decodable {
     let id: Int
     let name: String
-    let sprites: PokemonSprites
+    let imagePath: String?
     let types: [String]
 
     var displayName: String {
@@ -26,7 +26,7 @@ struct Pokemon: Decodable {
     }
 
     var imageURL: URL? {
-        guard let imagePath = sprites.frontDefault else { return nil }
+        guard let imagePath else { return nil }
         return URL(string: imagePath)
     }
 
@@ -41,29 +41,35 @@ struct Pokemon: Decodable {
         case types
     }
 
+    enum SpriteCodingKeys: String, CodingKey {
+        case frontDefault = "front_default"
+    }
+
+    enum TypeSlotCodingKeys: String, CodingKey {
+        case type
+    }
+
+    enum TypeCodingKeys: String, CodingKey {
+        case name
+    }
+
     init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         id = try container.decode(Int.self, forKey: .id)
         name = try container.decode(String.self, forKey: .name)
-        sprites = try container.decode(PokemonSprites.self, forKey: .sprites)
+        let spritesContainer = try container.nestedContainer(keyedBy: SpriteCodingKeys.self, forKey: .sprites)
+        imagePath = try spritesContainer.decodeIfPresent(String.self, forKey: .frontDefault)
 
-        let typeSlots = try container.decode([PokemonTypeResponse].self, forKey: .types)
-        types = typeSlots.map { $0.type.name }
+        var typeSlotsContainer = try container.nestedUnkeyedContainer(forKey: .types)
+        var typeNames: [String] = []
+
+        while !typeSlotsContainer.isAtEnd {
+            let typeSlotContainer = try typeSlotsContainer.nestedContainer(keyedBy: TypeSlotCodingKeys.self)
+            let typeContainer = try typeSlotContainer.nestedContainer(keyedBy: TypeCodingKeys.self, forKey: .type)
+            let typeName = try typeContainer.decode(String.self, forKey: .name)
+            typeNames.append(typeName)
+        }
+
+        types = typeNames
     }
-}
-
-struct PokemonSprites: Decodable {
-    let frontDefault: String?
-
-    enum CodingKeys: String, CodingKey {
-        case frontDefault = "front_default"
-    }
-}
-
-private struct PokemonTypeResponse: Decodable {
-    let type: PokemonNamedResource
-}
-
-private struct PokemonNamedResource: Decodable {
-    let name: String
 }
