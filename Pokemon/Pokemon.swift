@@ -3,6 +3,10 @@ import Foundation
 struct PokemonItem: Decodable {
     let name: String
     let url: String
+
+    var id: Int? {
+        url.split(separator: "/").last.flatMap { Int($0) }
+    }
 }
 
 struct PokemonResponse: Decodable {
@@ -11,11 +15,28 @@ struct PokemonResponse: Decodable {
     let results: [PokemonItem]
 }
 
-struct Pokemon: Decodable {
+struct Pokemon {
     let id: Int
     let name: String
     let imagePath: String
     let types: [String]
+
+    init(id: Int, name: String, imagePath: String, types: [String] = []) {
+        self.id = id
+        self.name = name
+        self.imagePath = imagePath
+        self.types = types
+    }
+
+    init?(item: PokemonItem) {
+        guard let id = item.id else { return nil }
+
+        self.init(
+            id: id,
+            name: item.name,
+            imagePath: Self.imagePath(for: id)
+        )
+    }
 
     var displayName: String {
         name.capitalized
@@ -29,20 +50,17 @@ struct Pokemon: Decodable {
         types.map { $0.capitalized }
     }
 
-    enum CodingKeys: CodingKey {
-        case id
-        case name
-        case sprites
-        case types
+    func withTypes(_ types: [String]) -> Pokemon {
+        Pokemon(id: id, name: name, imagePath: imagePath, types: types)
     }
 
-    private struct Sprites: Decodable {
-        let frontDefault: String?
-
-        enum CodingKeys: String, CodingKey {
-            case frontDefault = "front_default"
-        }
+    private static func imagePath(for id: Int) -> String {
+        "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/\(id).png"
     }
+}
+
+struct PokemonDetailResponse: Decodable {
+    let types: [String]
 
     private struct TypeSlot: Decodable {
         let type: PokemonType
@@ -54,13 +72,11 @@ struct Pokemon: Decodable {
 
     init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
-        id = try container.decode(Int.self, forKey: .id)
-        name = try container.decode(String.self, forKey: .name)
-
-        let sprites = try container.decode(Sprites.self, forKey: .sprites)
-        imagePath = sprites.frontDefault ?? ""
-
         let typeSlots = try container.decode([TypeSlot].self, forKey: .types)
         types = typeSlots.map { $0.type.name }
+    }
+
+    private enum CodingKeys: CodingKey {
+        case types
     }
 }

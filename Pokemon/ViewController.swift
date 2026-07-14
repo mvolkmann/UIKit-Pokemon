@@ -7,8 +7,8 @@ class ViewController: UITableViewController {
     private let loadingIndicator = UIActivityIndicatorView(style: .large)
     private let loadingMoreIndicator = UIActivityIndicatorView(style: .medium)
     private let loadingLabel = UILabel()
-    private var pokemonByName: [String: Pokemon] = [:]
     private var pokemon: [Pokemon] = []
+    private var selectedPokemonForDetail: Pokemon?
     private var nextOffset = 0
     private var totalPokemonCount: Int?
     private var isLoadingInitialPage = false
@@ -84,10 +84,6 @@ class ViewController: UITableViewController {
                 totalPokemonCount = page.totalCount
                 nextOffset = page.nextOffset ?? page.pokemon.count
                 pokemon = page.pokemon
-                print(pokemon)
-                pokemonByName = Dictionary(
-                    uniqueKeysWithValues: page.pokemon.map { ($0.name, $0) }
-                )
                 tableView.reloadData()
             } catch {
                 showError(error)
@@ -134,7 +130,6 @@ class ViewController: UITableViewController {
 
         let startIndex = pokemon.count
         pokemon.append(contentsOf: newPokemon)
-        newPokemon.forEach { pokemonByName[$0.name] = $0 }
 
         let indexPaths = (startIndex ..< pokemon.count).map {
             IndexPath(row: $0, section: 0)
@@ -155,24 +150,27 @@ class ViewController: UITableViewController {
             PokemonResponse.self,
             from: data
         )
-        var pokemon: [Pokemon] = []
-        for listItem in listResponse.results {
-            guard let url = URL(string: listItem.url) else { continue }
-            let (detailData, detailResponse) = try await URLSession.shared
-                .data(from: url)
-            try Self.validate(detailResponse)
-            let detail = try JSONDecoder().decode(
-                Pokemon.self,
-                from: detailData
-            )
-            pokemon.append(detail)
-        }
+        let pokemon = listResponse.results.compactMap(Pokemon.init)
 
         return (
             pokemon.sorted { $0.id < $1.id },
             listResponse.count,
             Self.offset(from: listResponse.next)
         )
+    }
+
+    private func fetchPokemonTypes(for pokemon: Pokemon) async throws -> [String] {
+        let detailURL = pokemonListBaseURL.appendingPathComponent(
+            "\(pokemon.id)"
+        )
+        let (data, response) = try await URLSession.shared.data(from: detailURL)
+        try Self.validate(response)
+
+        let detail = try JSONDecoder().decode(
+            PokemonDetailResponse.self,
+            from: data
+        )
+        return detail.types
     }
 
     private func makePokemonListURL(offset: Int) throws -> URL {
@@ -381,15 +379,40 @@ class ViewController: UITableViewController {
         loadMorePokemonIfNeeded()
     }
 
+    override func tableView(
+        _ tableView: UITableView,
+        didSelectRowAt indexPath: IndexPath
+    ) {
+        tableView.deselectRow(at: indexPath, animated: true)
+        let selectedPokemon = pokemon[indexPath.row]
+
+        Task {
+            do {
+                let types = try await fetchPokemonTypes(for: selectedPokemon)
+                selectedPokemonForDetail = selectedPokemon.withTypes(types)
+                performSegue(withIdentifier: "ShowPokemonDetail", sender: self)
+            } catch {
+                showError(error)
+            }
+        }
+    }
+
+    override func shouldPerformSegue(
+        withIdentifier identifier: String,
+        sender: Any?
+    ) -> Bool {
+        guard identifier == "ShowPokemonDetail" else { return true }
+        return selectedPokemonForDetail != nil
+    }
+
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         guard segue.identifier == "ShowPokemonDetail",
               let detailViewController = segue
-              .destination as? PokemonDetailViewController,
-              let selectedIndexPath = tableView.indexPathForSelectedRow else {
+              .destination as? PokemonDetailViewController else {
             return
         }
 
-        let selectedPokemon = pokemon[selectedIndexPath.row]
-        detailViewController.pokemon = pokemonByName[selectedPokemon.name]
+        detailViewController.pokemon = selectedPokemonForDetail
+        selectedPokemonForDetail = nil
     }
 }
