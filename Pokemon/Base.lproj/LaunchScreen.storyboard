@@ -13,7 +13,28 @@
                     <view key="view" contentMode="scaleToFill" id="Ze5-6b-2t3">
                         <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="Charizard" translatesAutoresizingMaskIntoConstraints="NO" id="XNt-NV-s3A">
+                                <rect key="frame" x="87.5" y="293.5" width="200" height="200"/>
+                                <constraints>
+                                    <constraint firstAttribute="width" constant="200" id="tnX-EJ-4xF"/>
+                                    <constraint firstAttribute="height" constant="200" id="y2H-Zu-F3P"/>
+                                </constraints>
+                            </imageView>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Pokemon" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="T24-DG-cmS">
+                                <rect key="frame" x="87.5" y="226.5" width="200" height="43"/>
+                                <fontDescription key="fontDescription" type="boldSystem" pointSize="36"/>
+                                <color key="textColor" red="0.12941176470588237" green="0.27843137254901962" blue="0.65490196078431373" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                <nil key="highlightedColor"/>
+                            </label>
+                        </subviews>
                         <color key="backgroundColor" xcode11CocoaTouchSystemColor="systemBackgroundColor" cocoaTouchSystemColor="whiteColor"/>
+                        <constraints>
+                            <constraint firstItem="XNt-NV-s3A" firstAttribute="centerX" secondItem="Ze5-6b-2t3" secondAttribute="centerX" id="1gU-NM-sip"/>
+                            <constraint firstItem="T24-DG-cmS" firstAttribute="centerX" secondItem="Ze5-6b-2t3" secondAttribute="centerX" id="62g-er-LnB"/>
+                            <constraint firstItem="XNt-NV-s3A" firstAttribute="top" secondItem="T24-DG-cmS" secondAttribute="bottom" constant="24" id="BLz-Z5-U8C"/>
+                            <constraint firstItem="XNt-NV-s3A" firstAttribute="centerY" secondItem="Ze5-6b-2t3" secondAttribute="centerY" constant="60" id="WEH-LD-osw"/>
+                        </constraints>
                         <viewLayoutGuide key="safeArea" id="6Tk-OE-BBY"/>
                     </view>
                 </viewController>
@@ -22,4 +43,7 @@
             <point key="canvasLocation" x="53" y="375"/>
         </scene>
     </scenes>
+    <resources>
+        <image name="Charizard" width="475" height="475"/>
+    </resources>
 </document>
