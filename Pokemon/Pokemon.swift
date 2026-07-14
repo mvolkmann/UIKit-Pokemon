@@ -34,42 +34,38 @@ struct Pokemon: Decodable {
         types.map { $0.capitalized }
     }
 
-    enum CodingKeys: String, CodingKey {
+    enum CodingKeys: CodingKey {
         case id
         case name
         case sprites
         case types
     }
 
-    enum SpriteCodingKeys: String, CodingKey {
-        case frontDefault = "front_default"
+    private struct Sprites: Decodable {
+        let frontDefault: String?
+
+        enum CodingKeys: String, CodingKey {
+            case frontDefault = "front_default"
+        }
     }
 
-    enum TypeSlotCodingKeys: String, CodingKey {
-        case type
+    private struct TypeSlot: Decodable {
+        let type: PokemonType
     }
 
-    enum TypeCodingKeys: String, CodingKey {
-        case name
+    private struct PokemonType: Decodable {
+        let name: String
     }
 
     init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         id = try container.decode(Int.self, forKey: .id)
         name = try container.decode(String.self, forKey: .name)
-        let spritesContainer = try container.nestedContainer(keyedBy: SpriteCodingKeys.self, forKey: .sprites)
-        imagePath = try spritesContainer.decodeIfPresent(String.self, forKey: .frontDefault)
 
-        var typeSlotsContainer = try container.nestedUnkeyedContainer(forKey: .types)
-        var typeNames: [String] = []
+        let sprites = try container.decode(Sprites.self, forKey: .sprites)
+        imagePath = sprites.frontDefault
 
-        while !typeSlotsContainer.isAtEnd {
-            let typeSlotContainer = try typeSlotsContainer.nestedContainer(keyedBy: TypeSlotCodingKeys.self)
-            let typeContainer = try typeSlotContainer.nestedContainer(keyedBy: TypeCodingKeys.self, forKey: .type)
-            let typeName = try typeContainer.decode(String.self, forKey: .name)
-            typeNames.append(typeName)
-        }
-
-        types = typeNames
+        let typeSlots = try container.decode([TypeSlot].self, forKey: .types)
+        types = typeSlots.map { $0.type.name }
     }
 }
