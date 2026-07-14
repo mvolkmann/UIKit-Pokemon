@@ -49,17 +49,52 @@ struct PokemonNamedResource: Decodable {
 class ViewController: UITableViewController {
     private let pokemonListURL =
         URL(string: "https://pokeapi.co/api/v2/pokemon?limit=100")!
+    private let loadingIndicator = UIActivityIndicatorView(style: .large)
+    private let loadingLabel = UILabel()
     private var pokemonByName: [String: Pokemon] = [:]
     private var pokemon: [Pokemon] = []
 
     override func viewDidLoad() {
         super.viewDidLoad()
         title = "Pokemon"
+        configureLoadingView()
         loadPokemon()
     }
 
+    private func configureLoadingView() {
+        loadingLabel.text = "Loading Pokemon"
+        loadingLabel.font = .preferredFont(forTextStyle: .body)
+        loadingLabel.textColor = .secondaryLabel
+        loadingLabel.adjustsFontForContentSizeCategory = true
+
+        let loadingStack = UIStackView(arrangedSubviews: [
+            loadingLabel,
+            loadingIndicator
+        ])
+        loadingStack.axis = .vertical
+        loadingStack.alignment = .center
+        loadingStack.spacing = 12
+        loadingStack.translatesAutoresizingMaskIntoConstraints = false
+
+        let loadingView = UIView()
+        loadingView.addSubview(loadingStack)
+        NSLayoutConstraint.activate([
+            loadingStack.centerXAnchor.constraint(equalTo: loadingView.centerXAnchor),
+            loadingStack.centerYAnchor.constraint(equalTo: loadingView.centerYAnchor)
+        ])
+        tableView.backgroundView = loadingView
+    }
+
+    private func setLoading(_ isLoading: Bool) {
+        tableView.backgroundView?.isHidden = !isLoading
+        isLoading ? loadingIndicator.startAnimating() : loadingIndicator.stopAnimating()
+    }
+
     private func loadPokemon() {
+        setLoading(true)
         Task {
+            defer { setLoading(false) }
+
             do {
                 let pokemon = try await fetchFirstPokemon()
                 self.pokemon = pokemon
