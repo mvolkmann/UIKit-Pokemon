@@ -14,20 +14,15 @@ struct PokemonResponse: Decodable {
 struct Pokemon: Decodable {
     let id: Int
     let name: String
-    let imagePath: String?
+    let imagePath: String
     let types: [String]
 
     var displayName: String {
         name.capitalized
     }
 
-    var listDisplayName: String {
-        "#\(id) \(displayName)"
-    }
-
     var imageURL: URL? {
-        guard let imagePath else { return nil }
-        return URL(string: imagePath)
+        URL(string: imagePath)
     }
 
     var typeNames: [String] {
@@ -63,7 +58,7 @@ struct Pokemon: Decodable {
         name = try container.decode(String.self, forKey: .name)
 
         let sprites = try container.decode(Sprites.self, forKey: .sprites)
-        imagePath = sprites.frontDefault
+        imagePath = sprites.frontDefault ?? ""
 
         let typeSlots = try container.decode([TypeSlot].self, forKey: .types)
         types = typeSlots.map { $0.type.name }
