@@ -15,7 +15,7 @@ struct Pokemon: Decodable {
     let id: Int
     let name: String
     let sprites: PokemonSprites
-    let types: [PokemonTypeSlot]
+    let types: [String]
 
     var displayName: String {
         name.capitalized
@@ -31,7 +31,24 @@ struct Pokemon: Decodable {
     }
 
     var typeNames: [String] {
-        types.map { $0.type.name.capitalized }
+        types.map { $0.capitalized }
+    }
+
+    enum CodingKeys: String, CodingKey {
+        case id
+        case name
+        case sprites
+        case types
+    }
+
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        id = try container.decode(Int.self, forKey: .id)
+        name = try container.decode(String.self, forKey: .name)
+        sprites = try container.decode(PokemonSprites.self, forKey: .sprites)
+
+        let typeSlots = try container.decode([PokemonTypeResponse].self, forKey: .types)
+        types = typeSlots.map { $0.type.name }
     }
 }
 
@@ -43,11 +60,10 @@ struct PokemonSprites: Decodable {
     }
 }
 
-struct PokemonTypeSlot: Decodable {
-    let slot: Int
+private struct PokemonTypeResponse: Decodable {
     let type: PokemonNamedResource
 }
 
-struct PokemonNamedResource: Decodable {
+private struct PokemonNamedResource: Decodable {
     let name: String
 }
