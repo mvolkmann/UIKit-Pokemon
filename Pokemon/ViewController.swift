@@ -21,6 +21,10 @@ struct Pokemon: Decodable {
         name.capitalized
     }
 
+    var listDisplayName: String {
+        "#\(id) \(displayName)"
+    }
+
     var imageURL: URL? {
         guard let imagePath = sprites.frontDefault else { return nil }
         return URL(string: imagePath)
@@ -283,7 +287,7 @@ class ViewController: UITableViewController {
             for: indexPath
         )
         var content = cell.defaultContentConfiguration()
-        content.text = pokemon[indexPath.row].displayName
+        content.text = pokemon[indexPath.row].listDisplayName
         cell.contentConfiguration = content
         cell.accessoryType = .disclosureIndicator
         return cell
