@@ -152,7 +152,7 @@ class ViewController: UITableViewController {
         try Self.validate(response)
 
         let listResponse = try JSONDecoder().decode(
-            PokemonListResponse.self,
+            PokemonResponse.self,
             from: data
         )
         var pokemon: [Pokemon] = []

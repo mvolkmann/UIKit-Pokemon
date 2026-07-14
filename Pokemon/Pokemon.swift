@@ -1,14 +1,14 @@
 import Foundation
 
-struct PokemonListResponse: Decodable {
-    let count: Int
-    let next: String?
-    let results: [PokemonListItem]
-}
-
-struct PokemonListItem: Decodable {
+struct PokemonItem: Decodable {
     let name: String
     let url: String
+}
+
+struct PokemonResponse: Decodable {
+    let count: Int
+    let next: String?
+    let results: [PokemonItem]
 }
 
 struct Pokemon: Decodable {
