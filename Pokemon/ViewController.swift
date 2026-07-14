@@ -74,6 +74,8 @@ class ViewController: UITableViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         title = "Pokemon"
+        tableView.rowHeight = 68
+        tableView.estimatedRowHeight = 68
         configureLoadingView()
         loadPokemon()
     }
@@ -286,11 +288,140 @@ class ViewController: UITableViewController {
             withIdentifier: "PokemonCell",
             for: indexPath
         )
-        var content = cell.defaultContentConfiguration()
-        content.text = pokemon[indexPath.row].listDisplayName
-        cell.contentConfiguration = content
+        let pokemon = pokemon[indexPath.row]
+        configure(cell, with: pokemon)
         cell.accessoryType = .disclosureIndicator
+
+        if let imageURL = pokemon.imageURL,
+           let thumbnailImageView = cell.contentView.viewWithTag(1002)
+           as? UIImageView {
+            loadThumbnail(
+                from: imageURL,
+                for: thumbnailImageView,
+                in: cell,
+                pokemonID: pokemon.id
+            )
+        }
+
         return cell
+    }
+
+    private func configure(_ cell: UITableViewCell, with pokemon: Pokemon) {
+        cell.contentConfiguration = nil
+
+        let idLabel: UILabel
+        let thumbnailImageView: UIImageView
+        let nameLabel: UILabel
+
+        if let existingIDLabel = cell.contentView.viewWithTag(1001) as? UILabel,
+           let existingThumbnailImageView = cell.contentView.viewWithTag(1002)
+           as? UIImageView,
+           let existingNameLabel = cell.contentView.viewWithTag(1003) as? UILabel {
+            idLabel = existingIDLabel
+            thumbnailImageView = existingThumbnailImageView
+            nameLabel = existingNameLabel
+        } else {
+            idLabel = UILabel()
+            idLabel.tag = 1001
+            idLabel.font = .preferredFont(forTextStyle: .body)
+            idLabel.adjustsFontForContentSizeCategory = true
+            idLabel.setContentHuggingPriority(.required, for: .horizontal)
+
+            thumbnailImageView = UIImageView()
+            thumbnailImageView.tag = 1002
+            thumbnailImageView.contentMode = .scaleAspectFit
+            thumbnailImageView.tintColor = .secondaryLabel
+            thumbnailImageView.translatesAutoresizingMaskIntoConstraints = false
+            thumbnailImageView.widthAnchor.constraint(equalToConstant: 56)
+                .isActive = true
+            thumbnailImageView.heightAnchor.constraint(equalToConstant: 56)
+                .isActive = true
+
+            nameLabel = UILabel()
+            nameLabel.tag = 1003
+            nameLabel.font = .preferredFont(forTextStyle: .body)
+            nameLabel.adjustsFontForContentSizeCategory = true
+
+            let stackView = UIStackView(arrangedSubviews: [
+                idLabel,
+                thumbnailImageView,
+                nameLabel
+            ])
+            stackView.axis = .horizontal
+            stackView.alignment = .center
+            stackView.spacing = 8
+            stackView.translatesAutoresizingMaskIntoConstraints = false
+            cell.contentView.addSubview(stackView)
+
+            NSLayoutConstraint.activate([
+                stackView.leadingAnchor.constraint(
+                    equalTo: cell.contentView.layoutMarginsGuide.leadingAnchor
+                ),
+                stackView.trailingAnchor.constraint(
+                    equalTo: cell.contentView.layoutMarginsGuide.trailingAnchor
+                ),
+                stackView.topAnchor.constraint(
+                    equalTo: cell.contentView.layoutMarginsGuide.topAnchor
+                ),
+                stackView.bottomAnchor.constraint(
+                    equalTo: cell.contentView.layoutMarginsGuide.bottomAnchor
+                )
+            ])
+        }
+
+        idLabel.text = "#\(pokemon.id)"
+        thumbnailImageView.image = UIImage(systemName: "photo")
+        nameLabel.text = pokemon.displayName
+    }
+
+    private func loadThumbnail(
+        from url: URL,
+        for thumbnailImageView: UIImageView,
+        in cell: UITableViewCell,
+        pokemonID: Int
+    ) {
+        Task { [weak self, weak thumbnailImageView, weak cell] in
+            do {
+                let (data, response) = try await URLSession.shared.data(from: url)
+                guard let httpResponse = response as? HTTPURLResponse,
+                      (200 ... 299).contains(httpResponse.statusCode),
+                      let image = UIImage(data: data) else {
+                    return
+                }
+
+                self?.setThumbnail(
+                    image,
+                    in: thumbnailImageView,
+                    cell: cell,
+                    pokemonID: pokemonID
+                )
+            } catch {
+                self?.setThumbnail(
+                    UIImage(systemName: "exclamationmark.triangle"),
+                    in: thumbnailImageView,
+                    cell: cell,
+                    pokemonID: pokemonID
+                )
+            }
+        }
+    }
+
+    @MainActor
+    private func setThumbnail(
+        _ image: UIImage?,
+        in thumbnailImageView: UIImageView?,
+        cell: UITableViewCell?,
+        pokemonID: Int
+    ) {
+        guard let thumbnailImageView,
+              let cell,
+              let indexPath = tableView.indexPath(for: cell),
+              pokemon.indices.contains(indexPath.row),
+              pokemon[indexPath.row].id == pokemonID else {
+            return
+        }
+
+        thumbnailImageView.image = image
     }
 
     override func tableView(
