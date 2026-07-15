@@ -58,21 +58,25 @@ struct Pokemon {
 struct PokemonDetailResponse: Decodable {
     let types: [String] // only property in the response we care about
 
+    // Used in JSON decoding.
+    private enum CodingKeys: CodingKey {
+        case types
+    }
+
+    // Used in JSON decoding.
     private struct TypeSlot: Decodable {
         let type: PokemonType
     }
 
+    // Used in JSON decoding.
     private struct PokemonType: Decodable {
         let name: String
     }
 
+    // Sets the types property from Pokemon detail JSON data.
     init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         let typeSlots = try container.decode([TypeSlot].self, forKey: .types)
         types = typeSlots.map { $0.type.name }
-    }
-
-    private enum CodingKeys: CodingKey {
-        case types
     }
 }
