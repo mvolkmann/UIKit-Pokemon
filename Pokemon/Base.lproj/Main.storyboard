@@ -49,8 +49,9 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="image-001">
-                                <rect key="frame" x="0.0" y="196" width="393" height="393"/>
+                                <rect key="frame" x="76.5" y="196" width="240" height="240"/>
                                 <constraints>
+                                    <constraint firstAttribute="width" constant="240" id="image-width-001"/>
                                     <constraint firstAttribute="height" secondItem="image-001" secondAttribute="width" multiplier="1:1" id="image-aspect-001"/>
                                 </constraints>
                             </imageView>
@@ -75,9 +76,8 @@
                         <viewLayoutGuide key="safeArea" id="safe-detail-001"/>
                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                         <constraints>
-                            <constraint firstItem="image-001" firstAttribute="leading" secondItem="safe-detail-001" secondAttribute="leading" id="image-leading-001"/>
+                            <constraint firstItem="image-001" firstAttribute="centerX" secondItem="safe-detail-001" secondAttribute="centerX" id="image-center-001"/>
                             <constraint firstItem="image-001" firstAttribute="top" secondItem="safe-detail-001" secondAttribute="top" constant="24" id="image-top-001"/>
-                            <constraint firstItem="safe-detail-001" firstAttribute="trailing" secondItem="image-001" secondAttribute="trailing" id="image-trailing-001"/>
                             <constraint firstItem="type-row-001" firstAttribute="centerX" secondItem="safe-detail-001" secondAttribute="centerX" id="type-row-center-001"/>
                             <constraint firstItem="type-row-001" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="safe-detail-001" secondAttribute="leading" constant="24" id="type-row-leading-001"/>
                             <constraint firstItem="type-row-001" firstAttribute="top" secondItem="image-001" secondAttribute="bottom" constant="24" id="type-row-top-001"/>
