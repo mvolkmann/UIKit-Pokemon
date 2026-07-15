@@ -268,7 +268,7 @@ class ListVC: UITableViewController {
         return cell
     }
 
-    // Applies labels, image placeholders, and layout to a Pokemon cell.
+    // Applies labels, clears stale images, and lays out a Pokemon cell.
     private func configure(_ cell: UITableViewCell, with pokemon: Pokemon) {
         cell.contentConfiguration = nil
 
@@ -334,7 +334,7 @@ class ListVC: UITableViewController {
         }
 
         idLabel.text = "#\(pokemon.id)"
-        thumbnailImageView.image = UIImage(systemName: "photo")
+        thumbnailImageView.image = nil
         nameLabel.text = pokemon.name.capitalized
     }
 
