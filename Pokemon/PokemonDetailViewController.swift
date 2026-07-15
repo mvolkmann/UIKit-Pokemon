@@ -14,7 +14,7 @@ class PokemonDetailViewController: UIViewController {
     private func configureView() {
         guard let pokemon else { return }
 
-        title = pokemon.displayName
+        title = pokemon.name.capitalized
         typesLabel.text = pokemon.typeNames.joined(separator: ", ")
         imageView.image = UIImage(systemName: "photo")
         imageView.tintColor = .secondaryLabel

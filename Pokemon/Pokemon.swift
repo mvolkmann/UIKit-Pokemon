@@ -4,6 +4,7 @@ struct PokemonItem: Decodable {
     let name: String
     let url: String
 
+    // Computed from the URL last path part.
     var id: String {
         String(url.split(separator: "/").last!)
     }
@@ -19,7 +20,7 @@ struct Pokemon {
     let id: String
     let name: String
     let imagePath: String
-    let types: [String]
+    let types: [String] // loaded by detail request
 
     init(id: String, name: String, imagePath: String, types: [String] = []) {
         self.id = id
@@ -34,10 +35,6 @@ struct Pokemon {
             name: item.name,
             imagePath: Self.imagePath(for: item.id)
         )
-    }
-
-    var displayName: String {
-        name.capitalized
     }
 
     var imageURL: URL? {

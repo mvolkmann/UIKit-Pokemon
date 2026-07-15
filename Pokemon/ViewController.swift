@@ -319,7 +319,7 @@ class ViewController: UITableViewController {
 
         idLabel.text = "#\(pokemon.id)"
         thumbnailImageView.image = UIImage(systemName: "photo")
-        nameLabel.text = pokemon.displayName
+        nameLabel.text = pokemon.name.capitalized
     }
 
     private func loadThumbnail(
