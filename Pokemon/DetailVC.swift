@@ -15,7 +15,7 @@ class DetailVC: UIViewController {
         guard let pokemon else { return }
 
         title = pokemon.name.capitalized
-        typesLabel.text = pokemon.typeNames.joined(separator: ", ")
+        typesLabel.text = pokemon.typeNames
         imageView.image = UIImage(systemName: "photo")
         imageView.tintColor = .secondaryLabel
 

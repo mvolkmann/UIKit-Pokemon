@@ -41,8 +41,8 @@ struct Pokemon {
         URL(string: imagePath)
     }
 
-    var typeNames: [String] {
-        types.map { $0.capitalized }
+    var typeNames: String {
+        types.map { $0.capitalized }.joined(separator: ", ")
     }
 
     func withTypes(_ types: [String]) -> Pokemon {
