@@ -23,9 +23,8 @@ class ListVC: UITableViewController {
     // Sets up the list view and starts the initial Pokemon load.
     override func viewDidLoad() {
         super.viewDidLoad()
-        title = "Pokemon"
+        title = "Pokemon" // displayed at top of table
         tableView.rowHeight = 68
-        tableView.estimatedRowHeight = 68
         configureLoadingView()
         loadPokemon()
     }
