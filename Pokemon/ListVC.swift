@@ -1,6 +1,6 @@
 import UIKit
 
-class ViewController: UITableViewController {
+class ListVC: UITableViewController {
     private let pageSize = 100
     private let pokemonListBaseURL =
         URL(string: "https://pokeapi.co/api/v2/pokemon")!
@@ -415,7 +415,7 @@ class ViewController: UITableViewController {
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         guard segue.identifier == "ShowPokemonDetail",
               let detailViewController = segue
-              .destination as? PokemonDetailViewController else {
+              .destination as? DetailVC else {
             return
         }
 

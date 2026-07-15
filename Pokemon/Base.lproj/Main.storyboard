@@ -1,9 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="23504" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="nav-001">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="24765" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="nav-001">
     <device id="retina6_12" orientation="portrait" appearance="light"/>
     <dependencies>
-        <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="23506"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="24743"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="System colors in document resources" minToolsVersion="11.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
@@ -12,7 +11,7 @@
         <!--Pokemon-->
         <scene sceneID="scene-list">
             <objects>
-                <tableViewController id="list-001" customClass="ViewController" customModule="Pokemon" customModuleProvider="target" sceneMemberID="viewController">
+                <tableViewController id="list-001" customClass="ListVC" customModule="Pokemon" customModuleProvider="target" sceneMemberID="viewController">
                     <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="44" estimatedRowHeight="44" sectionHeaderHeight="28" sectionFooterHeight="28" id="table-001">
                         <rect key="frame" x="0.0" y="0.0" width="393" height="852"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -22,7 +21,7 @@
                                 <rect key="frame" x="0.0" y="50" width="393" height="44"/>
                                 <autoresizingMask key="autoresizingMask"/>
                                 <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="cell-001" id="cell-content-001">
-                                    <rect key="frame" x="0.0" y="0.0" width="359" height="44"/>
+                                    <rect key="frame" x="0.0" y="0.0" width="362.66666666666669" height="44"/>
                                     <autoresizingMask key="autoresizingMask"/>
                                 </tableViewCellContentView>
                                 <connections>
@@ -44,28 +43,28 @@
         <!--Pokemon Detail-->
         <scene sceneID="scene-detail">
             <objects>
-                <viewController id="detail-001" customClass="PokemonDetailViewController" customModule="Pokemon" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController id="detail-001" customClass="DetailVC" customModule="Pokemon" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="detail-view-001">
                         <rect key="frame" x="0.0" y="0.0" width="393" height="852"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="image-001">
-                                <rect key="frame" x="0.0" y="124" width="393" height="393"/>
+                                <rect key="frame" x="0.0" y="196" width="393" height="393"/>
                                 <constraints>
                                     <constraint firstAttribute="height" secondItem="image-001" secondAttribute="width" multiplier="1:1" id="image-aspect-001"/>
                                 </constraints>
                             </imageView>
-                            <stackView opaque="NO" contentMode="scaleToFill" axis="horizontal" alignment="center" spacing="8" translatesAutoresizingMaskIntoConstraints="NO" id="type-row-001">
-                                <rect key="frame" x="146" y="398" width="101" height="24"/>
+                            <stackView opaque="NO" contentMode="scaleToFill" alignment="center" spacing="8" translatesAutoresizingMaskIntoConstraints="NO" id="type-row-001">
+                                <rect key="frame" x="142.33333333333334" y="613" width="108.66666666666666" height="24"/>
                                 <subviews>
                                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Type:" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontForContentSizeCategory="YES" translatesAutoresizingMaskIntoConstraints="NO" id="type-title-001">
-                                        <rect key="frame" x="0.0" y="0.0" width="50" height="24"/>
+                                        <rect key="frame" x="0.0" y="0.0" width="48" height="24"/>
                                         <fontDescription key="fontDescription" style="UICTFontTextStyleTitle3"/>
                                         <nil key="textColor"/>
                                         <nil key="highlightedColor"/>
                                     </label>
                                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Types" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontForContentSizeCategory="YES" translatesAutoresizingMaskIntoConstraints="NO" id="types-001">
-                                        <rect key="frame" x="58" y="0.0" width="43" height="24"/>
+                                        <rect key="frame" x="56" y="0.0" width="52.666666666666657" height="24"/>
                                         <fontDescription key="fontDescription" style="UICTFontTextStyleTitle3"/>
                                         <color key="textColor" systemColor="secondaryLabelColor"/>
                                         <nil key="highlightedColor"/>
@@ -76,12 +75,12 @@
                         <viewLayoutGuide key="safeArea" id="safe-detail-001"/>
                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                         <constraints>
-                            <constraint firstItem="image-001" firstAttribute="top" secondItem="safe-detail-001" secondAttribute="top" constant="24" id="image-top-001"/>
                             <constraint firstItem="image-001" firstAttribute="leading" secondItem="safe-detail-001" secondAttribute="leading" id="image-leading-001"/>
+                            <constraint firstItem="image-001" firstAttribute="top" secondItem="safe-detail-001" secondAttribute="top" constant="24" id="image-top-001"/>
                             <constraint firstItem="safe-detail-001" firstAttribute="trailing" secondItem="image-001" secondAttribute="trailing" id="image-trailing-001"/>
-                            <constraint firstItem="type-row-001" firstAttribute="top" secondItem="image-001" secondAttribute="bottom" constant="24" id="type-row-top-001"/>
                             <constraint firstItem="type-row-001" firstAttribute="centerX" secondItem="safe-detail-001" secondAttribute="centerX" id="type-row-center-001"/>
                             <constraint firstItem="type-row-001" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="safe-detail-001" secondAttribute="leading" constant="24" id="type-row-leading-001"/>
+                            <constraint firstItem="type-row-001" firstAttribute="top" secondItem="image-001" secondAttribute="bottom" constant="24" id="type-row-top-001"/>
                             <constraint firstItem="safe-detail-001" firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="type-row-001" secondAttribute="trailing" constant="24" id="type-row-trailing-001"/>
                         </constraints>
                     </view>
@@ -101,7 +100,7 @@
                 <navigationController automaticallyAdjustsScrollViewInsets="NO" id="nav-001" sceneMemberID="viewController">
                     <toolbarItems/>
                     <navigationBar key="navigationBar" contentMode="scaleToFill" id="nav-bar-001">
-                        <rect key="frame" x="0.0" y="59" width="393" height="44"/>
+                        <rect key="frame" x="0.0" y="118" width="393" height="54"/>
                         <autoresizingMask key="autoresizingMask"/>
                     </navigationBar>
                     <nil name="viewControllers"/>
@@ -116,7 +115,7 @@
     </scenes>
     <resources>
         <systemColor name="secondaryLabelColor">
-            <color red="0.23529411764705882" green="0.23529411764705882" blue="0.2627450980392157" alpha="0.59999999999999998" colorSpace="custom" customColorSpace="sRGB"/>
+            <color red="0.23529411759999999" green="0.23529411759999999" blue="0.26274509800000001" alpha="0.59999999999999998" colorSpace="custom" customColorSpace="sRGB"/>
         </systemColor>
         <systemColor name="systemBackgroundColor">
             <color white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>

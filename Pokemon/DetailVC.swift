@@ -1,6 +1,6 @@
 import UIKit
 
-class PokemonDetailViewController: UIViewController {
+class DetailVC: UIViewController {
     @IBOutlet private var imageView: UIImageView!
     @IBOutlet private var typesLabel: UILabel!
 
