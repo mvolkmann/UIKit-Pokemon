@@ -6,11 +6,13 @@ class DetailVC: UIViewController {
 
     var pokemon: Pokemon?
 
+    // Configures the detail screen after the view has loaded.
     override func viewDidLoad() {
         super.viewDidLoad()
         configureView()
     }
 
+    // Displays the selected Pokemon name, types, and image placeholder.
     private func configureView() {
         guard let pokemon else { return }
 
@@ -25,6 +27,7 @@ class DetailVC: UIViewController {
         }
     }
 
+    // Downloads and displays the full-size Pokemon image.
     private func loadImage(from url: URL) async {
         do {
             let (data, response) = try await URLSession.shared.data(from: url)

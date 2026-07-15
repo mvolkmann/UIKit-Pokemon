@@ -4,21 +4,23 @@ class ListVC: UITableViewController {
     private let pageSize = 100
     private let pokemonListBaseURL =
         URL(string: "https://pokeapi.co/api/v2/pokemon")!
-    private let loadingIndicator = UIActivityIndicatorView(style: .large)
-    private let loadingMoreIndicator = UIActivityIndicatorView(style: .medium)
-    private let loadingLabel = UILabel()
+
     private var allPokemon: [Pokemon] = []
-    private var selectedPokemon: Pokemon?
-    private var nextOffset = 0
-    private var totalPokemonCount: Int?
     private var isLoadingInitialPage = false
     private var isLoadingMore = false
+    private let loadingIndicator = UIActivityIndicatorView(style: .large)
+    private let loadingLabel = UILabel()
+    private let loadingMoreIndicator = UIActivityIndicatorView(style: .medium)
+    private var nextOffset = 0
+    private var selectedPokemon: Pokemon?
+    private var totalPokemonCount: Int?
 
     private var hasMorePokemon: Bool {
         guard let totalPokemonCount else { return true }
         return allPokemon.count < totalPokemonCount
     }
 
+    // Sets up the list view and starts the initial Pokemon load.
     override func viewDidLoad() {
         super.viewDidLoad()
         title = "Pokemon"
@@ -28,6 +30,7 @@ class ListVC: UITableViewController {
         loadPokemon()
     }
 
+    // Creates the loading views used while Pokemon data is being fetched.
     private func configureLoadingView() {
         loadingLabel.text = "Loading Pokemon"
         loadingLabel.font = .preferredFont(forTextStyle: .body)
@@ -62,12 +65,14 @@ class ListVC: UITableViewController {
         )
     }
 
+    // Shows or hides the initial loading indicator.
     private func setLoading(_ isLoading: Bool) {
         tableView.backgroundView?.isHidden = !isLoading
         isLoading ? loadingIndicator.startAnimating() : loadingIndicator
             .stopAnimating()
     }
 
+    // Loads the first page of Pokemon and refreshes the table.
     private func loadPokemon() {
         guard !isLoadingInitialPage else { return }
 
@@ -91,6 +96,7 @@ class ListVC: UITableViewController {
         }
     }
 
+    // Loads another page when more Pokemon are available.
     private func loadMorePokemonIfNeeded() {
         guard hasMorePokemon,
               !isLoadingInitialPage,
@@ -119,12 +125,14 @@ class ListVC: UITableViewController {
         }
     }
 
+    // Shows or hides the footer spinner used for pagination.
     private func setLoadingMore(_ isLoading: Bool) {
         tableView.tableFooterView = isLoading ? loadingMoreIndicator : nil
         isLoading ? loadingMoreIndicator.startAnimating() : loadingMoreIndicator
             .stopAnimating()
     }
 
+    // Adds newly fetched Pokemon to the table without reloading existing rows.
     private func appendPokemon(_ newPokemon: [Pokemon]) {
         guard !newPokemon.isEmpty else { return }
 
@@ -137,6 +145,7 @@ class ListVC: UITableViewController {
         tableView.insertRows(at: indexPaths, with: .automatic)
     }
 
+    // Fetches and decodes one paged response from the Pokemon API.
     private func fetchPokemonPage(offset: Int) async throws -> (
         pokemon: [Pokemon],
         totalCount: Int,
@@ -159,6 +168,7 @@ class ListVC: UITableViewController {
         )
     }
 
+    // Fetches the type names for a single Pokemon.
     private func fetchPokemonTypes(for pokemon: Pokemon) async throws
         -> [String] {
         let detailURL = pokemonListBaseURL.appendingPathComponent(
@@ -174,6 +184,7 @@ class ListVC: UITableViewController {
         return detail.types
     }
 
+    // Builds a paged list URL for the requested offset.
     private func makePokemonListURL(offset: Int) throws -> URL {
         var components = URLComponents(
             url: pokemonListBaseURL,
@@ -188,6 +199,7 @@ class ListVC: UITableViewController {
         return url
     }
 
+    // Extracts the next page offset from a PokeAPI next URL.
     private static func offset(from nextURLString: String?) -> Int? {
         guard let nextURLString,
               let url = URL(string: nextURLString),
@@ -203,6 +215,7 @@ class ListVC: UITableViewController {
         return Int(offset)
     }
 
+    // Confirms that a URL response has a successful HTTP status code.
     private static func validate(_ response: URLResponse) throws {
         guard let httpResponse = response as? HTTPURLResponse,
               (200 ... 299).contains(httpResponse.statusCode) else {
@@ -210,6 +223,7 @@ class ListVC: UITableViewController {
         }
     }
 
+    // Presents a simple alert for loading or decoding failures.
     private func showError(_ error: Error) {
         let alert = UIAlertController(
             title: "Unable to Load Pokemon",
@@ -220,6 +234,7 @@ class ListVC: UITableViewController {
         present(alert, animated: true)
     }
 
+    // Returns the number of Pokemon rows currently loaded.
     override func tableView(
         _ tableView: UITableView,
         numberOfRowsInSection section: Int
@@ -227,6 +242,7 @@ class ListVC: UITableViewController {
         allPokemon.count
     }
 
+    // Creates and configures a table cell for a Pokemon row.
     override func tableView(
         _ tableView: UITableView,
         cellForRowAt indexPath: IndexPath
@@ -253,6 +269,7 @@ class ListVC: UITableViewController {
         return cell
     }
 
+    // Applies labels, image placeholders, and layout to a Pokemon cell.
     private func configure(_ cell: UITableViewCell, with pokemon: Pokemon) {
         cell.contentConfiguration = nil
 
@@ -322,6 +339,7 @@ class ListVC: UITableViewController {
         nameLabel.text = pokemon.name.capitalized
     }
 
+    // Downloads a thumbnail image for a visible Pokemon cell.
     private func loadThumbnail(
         from url: URL,
         for thumbnailImageView: UIImageView,
@@ -355,6 +373,7 @@ class ListVC: UITableViewController {
         }
     }
 
+    // Assigns a thumbnail only if the cell still represents the same Pokemon.
     @MainActor
     private func setThumbnail(
         _ image: UIImage?,
@@ -373,6 +392,7 @@ class ListVC: UITableViewController {
         thumbnailImageView.image = image
     }
 
+    // Starts loading the next page when the final row appears.
     override func tableView(
         _ tableView: UITableView,
         willDisplay cell: UITableViewCell,
@@ -382,7 +402,7 @@ class ListVC: UITableViewController {
         loadMorePokemonIfNeeded()
     }
 
-    // Called when a table row is selected.
+    // Loads detail data and opens the detail screen for the selected Pokemon.
     override func tableView(
         _ tableView: UITableView,
         didSelectRowAt indexPath: IndexPath
@@ -404,6 +424,7 @@ class ListVC: UITableViewController {
         tableView.deselectRow(at: indexPath, animated: true)
     }
 
+    // Allows the detail segue only after detail data has been loaded.
     override func shouldPerformSegue(
         withIdentifier identifier: String,
         sender: Any?
@@ -412,6 +433,7 @@ class ListVC: UITableViewController {
         return selectedPokemon != nil
     }
 
+    // Passes the selected Pokemon to the destination detail view controller.
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         guard segue.identifier == "ShowPokemonDetail",
               let detailViewController = segue
