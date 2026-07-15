@@ -6,8 +6,8 @@ struct PokemonItem: Decodable {
     let url: String
 
     // Computed from the URL last path part.
-    var id: String {
-        String(url.split(separator: "/").last!)
+    var id: Int? {
+        url.split(separator: "/").last.flatMap { Int($0) }
     }
 }
 
@@ -19,18 +19,19 @@ struct PokemonListResponse: Decodable {
 }
 
 struct Pokemon {
-    let id: String
+    let id: Int
     let name: String
     let types: [String] // loaded by detail request; see withTypes method
 
-    init(id: String, name: String, types: [String] = []) {
+    init(id: Int, name: String, types: [String] = []) {
         self.id = id
         self.name = name
         self.types = types
     }
 
     init?(item: PokemonItem) {
-        self.init(id: item.id, name: item.name)
+        guard let id = item.id else { return nil }
+        self.init(id: id, name: item.name)
     }
 
     // Computes the image URL from the Pokemon id.

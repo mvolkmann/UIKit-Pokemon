@@ -153,7 +153,7 @@ class ListVC: UITableViewController {
         let pokemon = listResponse.results.compactMap(Pokemon.init)
 
         return (
-            pokemon.sorted { $0.id < $1.id },
+            pokemon,
             listResponse.count,
             Self.offset(from: listResponse.next)
         )
@@ -326,7 +326,7 @@ class ListVC: UITableViewController {
         from url: URL,
         for thumbnailImageView: UIImageView,
         in cell: UITableViewCell,
-        pokemonID: String
+        pokemonID: Int
     ) {
         Task { [weak self, weak thumbnailImageView, weak cell] in
             do {
@@ -360,7 +360,7 @@ class ListVC: UITableViewController {
         _ image: UIImage?,
         in thumbnailImageView: UIImageView?,
         cell: UITableViewCell?,
-        pokemonID: String
+        pokemonID: Int
     ) {
         guard let thumbnailImageView,
               let cell,
