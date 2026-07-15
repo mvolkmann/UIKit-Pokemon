@@ -159,7 +159,8 @@ class ViewController: UITableViewController {
         )
     }
 
-    private func fetchPokemonTypes(for pokemon: Pokemon) async throws -> [String] {
+    private func fetchPokemonTypes(for pokemon: Pokemon) async throws
+        -> [String] {
         let detailURL = pokemonListBaseURL.appendingPathComponent(
             "\(pokemon.id)"
         )
@@ -262,7 +263,8 @@ class ViewController: UITableViewController {
         if let existingIDLabel = cell.contentView.viewWithTag(1001) as? UILabel,
            let existingThumbnailImageView = cell.contentView.viewWithTag(1002)
            as? UIImageView,
-           let existingNameLabel = cell.contentView.viewWithTag(1003) as? UILabel {
+           let existingNameLabel = cell.contentView
+           .viewWithTag(1003) as? UILabel {
             idLabel = existingIDLabel
             thumbnailImageView = existingThumbnailImageView
             nameLabel = existingNameLabel
@@ -324,11 +326,12 @@ class ViewController: UITableViewController {
         from url: URL,
         for thumbnailImageView: UIImageView,
         in cell: UITableViewCell,
-        pokemonID: Int
+        pokemonID: String
     ) {
         Task { [weak self, weak thumbnailImageView, weak cell] in
             do {
-                let (data, response) = try await URLSession.shared.data(from: url)
+                let (data, response) = try await URLSession.shared
+                    .data(from: url)
                 guard let httpResponse = response as? HTTPURLResponse,
                       (200 ... 299).contains(httpResponse.statusCode),
                       let image = UIImage(data: data) else {
@@ -357,7 +360,7 @@ class ViewController: UITableViewController {
         _ image: UIImage?,
         in thumbnailImageView: UIImageView?,
         cell: UITableViewCell?,
-        pokemonID: Int
+        pokemonID: String
     ) {
         guard let thumbnailImageView,
               let cell,

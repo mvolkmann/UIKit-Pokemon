@@ -4,8 +4,8 @@ struct PokemonItem: Decodable {
     let name: String
     let url: String
 
-    var id: Int? {
-        url.split(separator: "/").last.flatMap { Int($0) }
+    var id: String {
+        String(url.split(separator: "/").last!)
     }
 }
 
@@ -16,12 +16,12 @@ struct PokemonResponse: Decodable {
 }
 
 struct Pokemon {
-    let id: Int
+    let id: String
     let name: String
     let imagePath: String
     let types: [String]
 
-    init(id: Int, name: String, imagePath: String, types: [String] = []) {
+    init(id: String, name: String, imagePath: String, types: [String] = []) {
         self.id = id
         self.name = name
         self.imagePath = imagePath
@@ -29,12 +29,10 @@ struct Pokemon {
     }
 
     init?(item: PokemonItem) {
-        guard let id = item.id else { return nil }
-
         self.init(
-            id: id,
+            id: item.id,
             name: item.name,
-            imagePath: Self.imagePath(for: id)
+            imagePath: Self.imagePath(for: item.id)
         )
     }
 
@@ -54,7 +52,7 @@ struct Pokemon {
         Pokemon(id: id, name: name, imagePath: imagePath, types: types)
     }
 
-    private static func imagePath(for id: Int) -> String {
+    private static func imagePath(for id: String) -> String {
         "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/\(id).png"
     }
 }
