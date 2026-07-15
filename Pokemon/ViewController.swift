@@ -7,8 +7,8 @@ class ViewController: UITableViewController {
     private let loadingIndicator = UIActivityIndicatorView(style: .large)
     private let loadingMoreIndicator = UIActivityIndicatorView(style: .medium)
     private let loadingLabel = UILabel()
-    private var pokemon: [Pokemon] = []
-    private var selectedPokemonForDetail: Pokemon?
+    private var allPokemon: [Pokemon] = []
+    private var selectedPokemon: Pokemon?
     private var nextOffset = 0
     private var totalPokemonCount: Int?
     private var isLoadingInitialPage = false
@@ -16,7 +16,7 @@ class ViewController: UITableViewController {
 
     private var hasMorePokemon: Bool {
         guard let totalPokemonCount else { return true }
-        return pokemon.count < totalPokemonCount
+        return allPokemon.count < totalPokemonCount
     }
 
     override func viewDidLoad() {
@@ -83,7 +83,7 @@ class ViewController: UITableViewController {
                 let page = try await fetchPokemonPage(offset: 0)
                 totalPokemonCount = page.totalCount
                 nextOffset = page.nextOffset ?? page.pokemon.count
-                pokemon = page.pokemon
+                allPokemon = page.pokemon
                 tableView.reloadData()
             } catch {
                 showError(error)
@@ -110,7 +110,7 @@ class ViewController: UITableViewController {
             do {
                 let page = try await fetchPokemonPage(offset: offset)
                 totalPokemonCount = page.totalCount
-                nextOffset = page.nextOffset ?? pokemon.count + page.pokemon
+                nextOffset = page.nextOffset ?? allPokemon.count + page.pokemon
                     .count
                 appendPokemon(page.pokemon)
             } catch {
@@ -128,10 +128,10 @@ class ViewController: UITableViewController {
     private func appendPokemon(_ newPokemon: [Pokemon]) {
         guard !newPokemon.isEmpty else { return }
 
-        let startIndex = pokemon.count
-        pokemon.append(contentsOf: newPokemon)
+        let startIndex = allPokemon.count
+        allPokemon.append(contentsOf: newPokemon)
 
-        let indexPaths = (startIndex ..< pokemon.count).map {
+        let indexPaths = (startIndex ..< allPokemon.count).map {
             IndexPath(row: $0, section: 0)
         }
         tableView.insertRows(at: indexPaths, with: .automatic)
@@ -224,7 +224,7 @@ class ViewController: UITableViewController {
         _ tableView: UITableView,
         numberOfRowsInSection section: Int
     ) -> Int {
-        pokemon.count
+        allPokemon.count
     }
 
     override func tableView(
@@ -235,7 +235,7 @@ class ViewController: UITableViewController {
             withIdentifier: "PokemonCell",
             for: indexPath
         )
-        let pokemon = pokemon[indexPath.row]
+        let pokemon = allPokemon[indexPath.row]
         configure(cell, with: pokemon)
         cell.accessoryType = .disclosureIndicator
 
@@ -365,8 +365,8 @@ class ViewController: UITableViewController {
         guard let thumbnailImageView,
               let cell,
               let indexPath = tableView.indexPath(for: cell),
-              pokemon.indices.contains(indexPath.row),
-              pokemon[indexPath.row].id == pokemonID else {
+              allPokemon.indices.contains(indexPath.row),
+              allPokemon[indexPath.row].id == pokemonID else {
             return
         }
 
@@ -378,21 +378,22 @@ class ViewController: UITableViewController {
         willDisplay cell: UITableViewCell,
         forRowAt indexPath: IndexPath
     ) {
-        guard indexPath.row == pokemon.count - 1 else { return }
+        guard indexPath.row == allPokemon.count - 1 else { return }
         loadMorePokemonIfNeeded()
     }
 
+    // Called when a table row is selected.
     override func tableView(
         _ tableView: UITableView,
         didSelectRowAt indexPath: IndexPath
     ) {
         tableView.deselectRow(at: indexPath, animated: true)
-        let selectedPokemon = pokemon[indexPath.row]
+        let aPokemon = allPokemon[indexPath.row]
 
         Task {
             do {
-                let types = try await fetchPokemonTypes(for: selectedPokemon)
-                selectedPokemonForDetail = selectedPokemon.withTypes(types)
+                let types = try await fetchPokemonTypes(for: aPokemon)
+                selectedPokemon = aPokemon.withTypes(types)
                 performSegue(withIdentifier: "ShowPokemonDetail", sender: self)
             } catch {
                 showError(error)
@@ -405,7 +406,7 @@ class ViewController: UITableViewController {
         sender: Any?
     ) -> Bool {
         guard identifier == "ShowPokemonDetail" else { return true }
-        return selectedPokemonForDetail != nil
+        return selectedPokemon != nil
     }
 
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
@@ -415,7 +416,7 @@ class ViewController: UITableViewController {
             return
         }
 
-        detailViewController.pokemon = selectedPokemonForDetail
-        selectedPokemonForDetail = nil
+        detailViewController.pokemon = selectedPokemon
+        selectedPokemon = nil
     }
 }
