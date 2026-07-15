@@ -326,7 +326,7 @@ class ListVC: UITableViewController {
         from url: URL,
         for thumbnailImageView: UIImageView,
         in cell: UITableViewCell,
-        pokemonID: Int
+        pokemonID: String
     ) {
         Task { [weak self, weak thumbnailImageView, weak cell] in
             do {
@@ -360,7 +360,7 @@ class ListVC: UITableViewController {
         _ image: UIImage?,
         in thumbnailImageView: UIImageView?,
         cell: UITableViewCell?,
-        pokemonID: Int
+        pokemonID: String
     ) {
         guard let thumbnailImageView,
               let cell,
