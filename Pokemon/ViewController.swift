@@ -387,7 +387,6 @@ class ViewController: UITableViewController {
         _ tableView: UITableView,
         didSelectRowAt indexPath: IndexPath
     ) {
-        tableView.deselectRow(at: indexPath, animated: true)
         let aPokemon = allPokemon[indexPath.row]
 
         Task {
@@ -399,6 +398,10 @@ class ViewController: UITableViewController {
                 showError(error)
             }
         }
+
+        // Deselect the row so when the user returns to the list view,
+        // it is no longer selected.
+        tableView.deselectRow(at: indexPath, animated: true)
     }
 
     override func shouldPerformSegue(
