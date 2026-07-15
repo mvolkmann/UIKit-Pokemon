@@ -1,5 +1,6 @@
 import Foundation
 
+// Used by PokemonResponse.
 struct PokemonItem: Decodable {
     let name: String
     let url: String
@@ -10,6 +11,7 @@ struct PokemonItem: Decodable {
     }
 }
 
+// Matches JSON returned for a list of Pokemon.
 struct PokemonResponse: Decodable {
     let count: Int
     let next: String?
@@ -19,22 +21,20 @@ struct PokemonResponse: Decodable {
 struct Pokemon {
     let id: String
     let name: String
-    let imagePath: String
     let types: [String] // loaded by detail request
 
-    init(id: String, name: String, imagePath: String, types: [String] = []) {
+    init(id: String, name: String, types: [String] = []) {
         self.id = id
         self.name = name
-        self.imagePath = imagePath
         self.types = types
     }
 
     init?(item: PokemonItem) {
-        self.init(
-            id: item.id,
-            name: item.name,
-            imagePath: Self.imagePath(for: item.id)
-        )
+        self.init(id: item.id, name: item.name)
+    }
+
+    var imagePath: String {
+        "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/\(id).png"
     }
 
     var imageURL: URL? {
@@ -46,11 +46,7 @@ struct Pokemon {
     }
 
     func withTypes(_ types: [String]) -> Pokemon {
-        Pokemon(id: id, name: name, imagePath: imagePath, types: types)
-    }
-
-    private static func imagePath(for id: String) -> String {
-        "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/\(id).png"
+        Pokemon(id: id, name: name, types: types)
     }
 }
 
