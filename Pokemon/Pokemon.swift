@@ -12,7 +12,7 @@ struct PokemonItem: Decodable {
 }
 
 // Matches JSON returned for a list of Pokemon.
-struct PokemonResponse: Decodable {
+struct PokemonListResponse: Decodable {
     let count: Int
     let next: String?
     let results: [PokemonItem]
@@ -21,7 +21,7 @@ struct PokemonResponse: Decodable {
 struct Pokemon {
     let id: String
     let name: String
-    let types: [String] // loaded by detail request
+    let types: [String] // loaded by detail request; see withTypes method
 
     init(id: String, name: String, types: [String] = []) {
         self.id = id
@@ -33,6 +33,7 @@ struct Pokemon {
         self.init(id: item.id, name: item.name)
     }
 
+    // Computes the image URL from the Pokemon id.
     var imagePath: String {
         "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/\(id).png"
     }
@@ -41,17 +42,21 @@ struct Pokemon {
         URL(string: imagePath)
     }
 
+    // Creates a string representation of the types array
+    // for presenting in the UI.
     var typeNames: String {
         types.map { $0.capitalized }.joined(separator: ", ")
     }
 
+    // Creates a new instance of the Pokemon struct
+    // whose types property is set.
     func withTypes(_ types: [String]) -> Pokemon {
         Pokemon(id: id, name: name, types: types)
     }
 }
 
 struct PokemonDetailResponse: Decodable {
-    let types: [String]
+    let types: [String] // only property in the response we care about
 
     private struct TypeSlot: Decodable {
         let type: PokemonType

@@ -147,7 +147,7 @@ class ListVC: UITableViewController {
         try Self.validate(response)
 
         let listResponse = try JSONDecoder().decode(
-            PokemonResponse.self,
+            PokemonListResponse.self,
             from: data
         )
         let pokemon = listResponse.results.compactMap(Pokemon.init)
