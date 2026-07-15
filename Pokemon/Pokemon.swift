@@ -19,6 +19,8 @@ struct PokemonListResponse: Decodable {
 }
 
 struct Pokemon {
+    // The id value is actually an Int, but in this app
+    // there's no benefit to converting the String values to Int values.
     let id: String
     let name: String
     let types: [String] // loaded by detail request; see withTypes method
