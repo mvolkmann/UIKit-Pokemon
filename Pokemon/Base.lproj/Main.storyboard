@@ -34,7 +34,7 @@
                             <outlet property="delegate" destination="list-001" id="table-del-001"/>
                         </connections>
                     </tableView>
-                    <navigationItem key="navigationItem" title="Pokemon" id="nav-item-list"/>
+                    <navigationItem key="navigationItem" title="Pokémon" id="nav-item-list"/>
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="first-list" sceneMemberID="firstResponder"/>
             </objects>

@@ -6,24 +6,16 @@ class ListVC: UITableViewController {
         URL(string: "https://pokeapi.co/api/v2/pokemon")!
 
     private var allPokemon: [Pokemon] = []
-    private var isLoadingInitialPage = false
-    private var isLoadingMore = false
     private let loadingIndicator = UIActivityIndicatorView(style: .large)
     private let loadingLabel = UILabel()
     private let loadingMoreIndicator = UIActivityIndicatorView(style: .medium)
-    private var nextOffset = 0
+    private var nextOffset: Int?
     private var selectedPokemon: Pokemon?
-    private var totalPokemonCount: Int?
-
-    private var hasMorePokemon: Bool {
-        guard let totalPokemonCount else { return true }
-        return allPokemon.count < totalPokemonCount
-    }
 
     // Sets up the list view and starts the initial Pokemon load.
     override func viewDidLoad() {
         super.viewDidLoad()
-        title = "Pokemon" // displayed at top of table
+        title = "Pokémon" // displayed at top of table
         tableView.rowHeight = 68
         configureLoadingView()
         loadPokemon()
@@ -31,7 +23,7 @@ class ListVC: UITableViewController {
 
     // Creates the loading views used while Pokemon data is being fetched.
     private func configureLoadingView() {
-        loadingLabel.text = "Loading Pokemon"
+        loadingLabel.text = "Loading Pokémon"
         loadingLabel.font = .preferredFont(forTextStyle: .body)
         loadingLabel.textColor = .secondaryLabel
         loadingLabel.adjustsFontForContentSizeCategory = true
@@ -73,20 +65,13 @@ class ListVC: UITableViewController {
 
     // Loads the first page of Pokemon and refreshes the table.
     private func loadPokemon() {
-        guard !isLoadingInitialPage else { return }
-
-        isLoadingInitialPage = true
         setLoading(true)
         Task {
-            defer {
-                isLoadingInitialPage = false
-                setLoading(false)
-            }
+            defer { setLoading(false) }
 
             do {
                 let page = try await fetchPokemonPage(offset: 0)
-                totalPokemonCount = page.totalCount
-                nextOffset = page.nextOffset ?? page.pokemon.count
+                nextOffset = page.nextOffset
                 allPokemon = page.pokemon
                 tableView.reloadData()
             } catch {
@@ -97,28 +82,19 @@ class ListVC: UITableViewController {
 
     // Loads another page when more Pokemon are available.
     private func loadMorePokemonIfNeeded() {
-        guard hasMorePokemon,
-              !isLoadingInitialPage,
-              !isLoadingMore else {
-            return
-        }
+        guard let offset = nextOffset else { return }
 
-        isLoadingMore = true
+        nextOffset = nil
         setLoadingMore(true)
-        let offset = nextOffset
         Task {
-            defer {
-                isLoadingMore = false
-                setLoadingMore(false)
-            }
+            defer { setLoadingMore(false) }
 
             do {
                 let page = try await fetchPokemonPage(offset: offset)
-                totalPokemonCount = page.totalCount
-                nextOffset = page.nextOffset ?? allPokemon.count + page.pokemon
-                    .count
+                nextOffset = page.nextOffset
                 appendPokemon(page.pokemon)
             } catch {
+                nextOffset = offset
                 showError(error)
             }
         }
@@ -147,7 +123,6 @@ class ListVC: UITableViewController {
     // Fetches and decodes one paged response from the Pokemon API.
     private func fetchPokemonPage(offset: Int) async throws -> (
         pokemon: [Pokemon],
-        totalCount: Int,
         nextOffset: Int?
     ) {
         let listURL = try makePokemonListURL(offset: offset)
@@ -162,7 +137,6 @@ class ListVC: UITableViewController {
 
         return (
             pokemon,
-            listResponse.count,
             Self.offset(from: listResponse.next)
         )
     }
