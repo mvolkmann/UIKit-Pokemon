@@ -236,6 +236,7 @@ class ListVC: UITableViewController {
                 image = UIImage(systemName: "exclamationmark.triangle")
             }
 
+            // UIKit views must be updated on the main actor.
             await MainActor.run {
                 guard let indexPath = tableView.indexPath(for: cell),
                       loadedPokemon[indexPath.row].id == pokemonID else {
