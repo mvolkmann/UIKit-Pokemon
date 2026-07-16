@@ -215,8 +215,7 @@ class ListVC: UITableViewController {
         return cell
     }
 
-
-    // Downloads a thumbnail image for a visible Pokemon cell.
+    // Downloads a thumbnail image for a Pokemon cell.
     private func loadThumbnail(
         from url: URL,
         for thumbnailImageView: UIImageView,
@@ -224,49 +223,34 @@ class ListVC: UITableViewController {
         pokemonID: String
     ) {
         Task { [weak self, weak thumbnailImageView, weak cell] in
+            let image: UIImage?
+
             do {
                 let (data, response) = try await URLSession.shared
                     .data(from: url)
                 guard let httpResponse = response as? HTTPURLResponse,
                       (200 ... 299).contains(httpResponse.statusCode),
-                      let image = UIImage(data: data) else {
+                      let fetchedImage = UIImage(data: data) else {
+                    return
+                }
+                image = fetchedImage
+            } catch {
+                image = UIImage(systemName: "exclamationmark.triangle")
+            }
+
+            await MainActor.run {
+                guard let self,
+                      let thumbnailImageView,
+                      let cell,
+                      let indexPath = self.tableView.indexPath(for: cell),
+                      self.loadedPokemon.indices.contains(indexPath.row),
+                      self.loadedPokemon[indexPath.row].id == pokemonID else {
                     return
                 }
 
-                self?.setThumbnail(
-                    image,
-                    in: thumbnailImageView,
-                    cell: cell,
-                    pokemonID: pokemonID
-                )
-            } catch {
-                self?.setThumbnail(
-                    UIImage(systemName: "exclamationmark.triangle"),
-                    in: thumbnailImageView,
-                    cell: cell,
-                    pokemonID: pokemonID
-                )
+                thumbnailImageView.image = image
             }
         }
-    }
-
-    // Assigns a thumbnail only if the cell still represents the same Pokemon.
-    @MainActor
-    private func setThumbnail(
-        _ image: UIImage?,
-        in thumbnailImageView: UIImageView?,
-        cell: UITableViewCell?,
-        pokemonID: String
-    ) {
-        guard let thumbnailImageView,
-              let cell,
-              let indexPath = tableView.indexPath(for: cell),
-              loadedPokemon.indices.contains(indexPath.row),
-              loadedPokemon[indexPath.row].id == pokemonID else {
-            return
-        }
-
-        thumbnailImageView.image = image
     }
 
     // Starts loading the next page when the final row appears.
