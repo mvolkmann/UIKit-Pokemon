@@ -5,6 +5,7 @@ class ListVC: UITableViewController {
         URL(string: "https://pokeapi.co/api/v2/pokemon")!
     private static let listInitialURL =
         URL(string: "\(listBaseURL)?limit=100")!
+    private static let rowHeight = 56.0
 
     private let loadingIndicator = UIActivityIndicatorView(style: .large)
 
@@ -53,7 +54,7 @@ class ListVC: UITableViewController {
             x: 0,
             y: 0,
             width: tableView.bounds.width,
-            height: 56
+            height: Self.rowHeight
         )
     }
 
@@ -244,9 +245,11 @@ class ListVC: UITableViewController {
             thumbnailImageView.contentMode = .scaleAspectFit
             thumbnailImageView.tintColor = .secondaryLabel
             thumbnailImageView.translatesAutoresizingMaskIntoConstraints = false
-            thumbnailImageView.widthAnchor.constraint(equalToConstant: 56)
+            thumbnailImageView.widthAnchor
+                .constraint(equalToConstant: Self.rowHeight)
                 .isActive = true
-            thumbnailImageView.heightAnchor.constraint(equalToConstant: 56)
+            thumbnailImageView.heightAnchor
+                .constraint(equalToConstant: Self.rowHeight)
                 .isActive = true
 
             nameLabel = UILabel()
