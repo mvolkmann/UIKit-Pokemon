@@ -7,7 +7,6 @@ class ListVC: UITableViewController {
 
     private var allPokemon: [Pokemon] = []
     private let loadingIndicator = UIActivityIndicatorView(style: .large)
-    private let loadingLabel = UILabel()
     private let loadingMoreIndicator = UIActivityIndicatorView(style: .medium)
     private var nextOffset: Int?
     private var selectedPokemon: Pokemon?
@@ -23,6 +22,7 @@ class ListVC: UITableViewController {
 
     // Creates the loading views used while Pokemon data is being fetched.
     private func configureLoadingView() {
+        let loadingLabel = UILabel()
         loadingLabel.text = "Loading Pokémon"
         loadingLabel.font = .preferredFont(forTextStyle: .body)
         loadingLabel.textColor = .secondaryLabel
@@ -67,14 +67,16 @@ class ListVC: UITableViewController {
     private func loadPokemon() {
         setLoading(true)
         Task {
-            defer { setLoading(false) }
-
             do {
                 let page = try await fetchPokemonPage(offset: 0)
+                try? await Task.sleep(for: .seconds(1))
+                setLoading(false)
                 nextOffset = page.nextOffset
                 allPokemon = page.pokemon
                 tableView.reloadData()
             } catch {
+                try? await Task.sleep(for: .seconds(0.5))
+                setLoading(false)
                 showError(error)
             }
         }
