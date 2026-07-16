@@ -1,14 +1,17 @@
 import UIKit
 
 class ListVC: UITableViewController {
-    private let pageSize = 100
-    private let pokemonListBaseURL =
+    private static let pageSize = 100
+    private static let listBaseURL =
         URL(string: "https://pokeapi.co/api/v2/pokemon")!
+    private static let listInitialURL =
+        URL(string: "\(listBaseURL)?limit=\(ListVC.pageSize)")!
 
-    private var allPokemon: [Pokemon] = []
     private let loadingIndicator = UIActivityIndicatorView(style: .large)
     private let loadingMoreIndicator = UIActivityIndicatorView(style: .medium)
-    private var nextOffset: Int?
+
+    private var allPokemon: [Pokemon] = []
+    private var nextPageURL: URL?
     private var selectedPokemon: Pokemon?
 
     // Sets up the list view and starts the initial Pokemon load.
@@ -68,10 +71,13 @@ class ListVC: UITableViewController {
         setLoading(true)
         Task {
             do {
-                let page = try await fetchPokemonPage(offset: 0)
+                let page =
+                    try await fetchPokemonPage(
+                        from: ListVC.listInitialURL
+                    )
                 try? await Task.sleep(for: .seconds(1))
                 setLoading(false)
-                nextOffset = page.nextOffset
+                nextPageURL = page.nextPageURL
                 allPokemon = page.pokemon
                 tableView.reloadData()
             } catch {
@@ -84,19 +90,19 @@ class ListVC: UITableViewController {
 
     // Loads another page when more Pokemon are available.
     private func loadMorePokemonIfNeeded() {
-        guard let offset = nextOffset else { return }
+        guard let url = nextPageURL else { return }
 
-        nextOffset = nil
+        // nextPageURL = nil
         setLoadingMore(true)
         Task {
             defer { setLoadingMore(false) }
 
             do {
-                let page = try await fetchPokemonPage(offset: offset)
-                nextOffset = page.nextOffset
+                let page = try await fetchPokemonPage(from: url)
+                nextPageURL = page.nextPageURL
                 appendPokemon(page.pokemon)
             } catch {
-                nextOffset = offset
+                nextPageURL = nil
                 showError(error)
             }
         }
@@ -123,12 +129,11 @@ class ListVC: UITableViewController {
     }
 
     // Fetches and decodes one paged response from the Pokemon API.
-    private func fetchPokemonPage(offset: Int) async throws -> (
+    private func fetchPokemonPage(from url: URL) async throws -> (
         pokemon: [Pokemon],
-        nextOffset: Int?
+        nextPageURL: URL?
     ) {
-        let listURL = try makePokemonListURL(offset: offset)
-        let (data, response) = try await URLSession.shared.data(from: listURL)
+        let (data, response) = try await URLSession.shared.data(from: url)
         try Self.validate(response)
 
         let listResponse = try JSONDecoder().decode(
@@ -139,14 +144,14 @@ class ListVC: UITableViewController {
 
         return (
             pokemon,
-            Self.offset(from: listResponse.next)
+            listResponse.next.flatMap(URL.init(string:))
         )
     }
 
     // Fetches detail data for a single Pokemon.
     private func fetchPokemonDetail(for pokemon: Pokemon) async throws
         -> PokemonDetailResponse {
-        let detailURL = pokemonListBaseURL.appendingPathComponent(
+        let detailURL = ListVC.listBaseURL.appendingPathComponent(
             "\(pokemon.id)"
         )
         let (data, response) = try await URLSession.shared.data(from: detailURL)
@@ -157,37 +162,6 @@ class ListVC: UITableViewController {
             from: data
         )
         return detail
-    }
-
-    // Builds a paged list URL for the requested offset.
-    private func makePokemonListURL(offset: Int) throws -> URL {
-        var components = URLComponents(
-            url: pokemonListBaseURL,
-            resolvingAgainstBaseURL: false
-        )
-        components?.queryItems = [
-            URLQueryItem(name: "limit", value: "\(pageSize)"),
-            URLQueryItem(name: "offset", value: "\(offset)")
-        ]
-
-        guard let url = components?.url else { throw URLError(.badURL) }
-        return url
-    }
-
-    // Extracts the next page offset from a PokeAPI next URL.
-    private static func offset(from nextURLString: String?) -> Int? {
-        guard let nextURLString,
-              let url = URL(string: nextURLString),
-              let components = URLComponents(
-                  url: url,
-                  resolvingAgainstBaseURL: false
-              ),
-              let offset = components.queryItems?
-              .first(where: { $0.name == "offset" })?.value else {
-            return nil
-        }
-
-        return Int(offset)
     }
 
     // Confirms that a URL response has a successful HTTP status code.
