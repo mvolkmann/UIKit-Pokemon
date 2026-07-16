@@ -70,10 +70,7 @@ class ListVC: UITableViewController {
     }
 
     // Fetches and decodes a paged response from the Pokemon API.
-    private func fetchPokemonList(from url: URL) async throws -> (
-        pokemon: [Pokemon],
-        nextPageURL: URL?
-    ) {
+    private func fetchPokemonList(from url: URL) async throws -> [Pokemon] {
         let (data, response) = try await URLSession.shared.data(from: url)
         try Self.validate(response)
 
@@ -81,18 +78,16 @@ class ListVC: UITableViewController {
             PokemonListResponse.self,
             from: data
         )
-        let pokemon = listResponse.results.map { item in
-            Pokemon(id: item.id, name: item.name)
-        }
 
-        let nextPageURL: URL?
         if let next = listResponse.next {
             nextPageURL = URL(string: next)
         } else {
             nextPageURL = nil
         }
 
-        return (pokemon, nextPageURL)
+        return listResponse.results.map { item in
+            Pokemon(id: item.id, name: item.name)
+        }
     }
 
     // Fetches detail data for a single Pokemon.
@@ -116,7 +111,7 @@ class ListVC: UITableViewController {
         setLoading(true)
         Task {
             do {
-                let page =
+                let pokemon =
                     try await fetchPokemonList(from: ListVC.listInitialURL)
 
                 // Sleep to ensure that the loading indicator is displayed
@@ -124,8 +119,7 @@ class ListVC: UITableViewController {
                 try? await Task.sleep(for: .seconds(1))
 
                 setLoading(false)
-                nextPageURL = page.nextPageURL
-                loadedPokemon = page.pokemon
+                loadedPokemon = pokemon
                 tableView.reloadData()
             } catch {
                 setLoading(false)
@@ -142,9 +136,8 @@ class ListVC: UITableViewController {
         Task {
             defer { setLoadingMore(false) }
             do {
-                let page = try await fetchPokemonList(from: url)
-                nextPageURL = page.nextPageURL
-                appendPokemon(page.pokemon)
+                let pokemon = try await fetchPokemonList(from: url)
+                appendPokemon(pokemon)
             } catch {
                 nextPageURL = nil
                 showError(error)
