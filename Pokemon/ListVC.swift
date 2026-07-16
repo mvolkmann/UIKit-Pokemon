@@ -81,12 +81,18 @@ class ListVC: UITableViewController {
             PokemonListResponse.self,
             from: data
         )
-        let pokemon = listResponse.results.compactMap(Pokemon.init)
+        let pokemon = listResponse.results.map { item in
+            Pokemon(id: item.id, name: item.name)
+        }
 
-        return (
-            pokemon,
-            listResponse.next.flatMap(URL.init(string:))
-        )
+        let nextPageURL: URL?
+        if let next = listResponse.next {
+            nextPageURL = URL(string: next)
+        } else {
+            nextPageURL = nil
+        }
+
+        return (pokemon, nextPageURL)
     }
 
     // Fetches detail data for a single Pokemon.
