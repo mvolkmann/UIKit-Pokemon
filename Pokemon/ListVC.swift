@@ -26,28 +26,6 @@ class ListVC: UITableViewController {
     private func configureLoadingView() {
         let loadingLabel = UILabel()
         loadingLabel.text = "Loading Pokémon"
-        loadingLabel.font = .preferredFont(forTextStyle: .body)
-        loadingLabel.textColor = .secondaryLabel
-        loadingLabel.adjustsFontForContentSizeCategory = true
-
-        let loadingStack = UIStackView(arrangedSubviews: [
-            loadingLabel,
-            loadingIndicator
-        ])
-        loadingStack.axis = .vertical
-        loadingStack.alignment = .center
-        loadingStack.spacing = 12
-        loadingStack.translatesAutoresizingMaskIntoConstraints = false
-
-        let loadingView = UIView()
-        loadingView.addSubview(loadingStack)
-        NSLayoutConstraint.activate([
-            loadingStack.centerXAnchor
-                .constraint(equalTo: loadingView.centerXAnchor),
-            loadingStack.centerYAnchor
-                .constraint(equalTo: loadingView.centerYAnchor)
-        ])
-        tableView.backgroundView = loadingView
 
         loadingIndicator.hidesWhenStopped = true
         loadingIndicator.frame = CGRect(
@@ -56,6 +34,25 @@ class ListVC: UITableViewController {
             width: tableView.bounds.width,
             height: Self.rowHeight
         )
+
+        let topSpacer = UIView()
+        let bottomSpacer = UIView()
+
+        let loadingStack = UIStackView(arrangedSubviews: [
+            topSpacer,
+            loadingLabel,
+            loadingIndicator,
+            bottomSpacer
+        ])
+        loadingStack.axis = .vertical
+        loadingStack.alignment = .center
+        loadingStack.spacing = 12
+        loadingStack.frame = tableView.bounds
+        loadingStack.autoresizingMask = [.flexibleWidth, .flexibleHeight]
+        bottomSpacer.heightAnchor.constraint(equalTo: topSpacer.heightAnchor)
+            .isActive = true
+
+        tableView.backgroundView = loadingStack
     }
 
     // Shows or hides the initial loading indicator.
