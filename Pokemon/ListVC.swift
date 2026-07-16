@@ -1,5 +1,6 @@
 import UIKit
 
+// This is the view controller used by the list screen.
 class ListVC: UITableViewController {
     private static let listBaseURL =
         URL(string: "https://pokeapi.co/api/v2/pokemon")!

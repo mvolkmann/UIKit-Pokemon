@@ -1,5 +1,6 @@
 import UIKit
 
+// This is the view controller used by the detail screen.
 class DetailVC: UIViewController {
     @IBOutlet private var imageView: UIImageView!
     @IBOutlet private var typesLabel: UILabel!
