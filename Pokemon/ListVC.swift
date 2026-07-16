@@ -7,7 +7,6 @@ class ListVC: UITableViewController {
         URL(string: "\(listBaseURL)?limit=100")!
 
     private let loadingIndicator = UIActivityIndicatorView(style: .large)
-    private let loadingMoreIndicator = UIActivityIndicatorView(style: .medium)
 
     private var allPokemon: [Pokemon] = []
     private var nextPageURL: URL?
@@ -22,7 +21,7 @@ class ListVC: UITableViewController {
         loadPokemon()
     }
 
-    // Creates the loading views used while Pokemon data is being fetched.
+    // Creates the loading view used while Pokemon data is being fetched.
     private func configureLoadingView() {
         let loadingLabel = UILabel()
         loadingLabel.text = "Loading Pokémon"
@@ -49,8 +48,8 @@ class ListVC: UITableViewController {
         ])
         tableView.backgroundView = loadingView
 
-        loadingMoreIndicator.hidesWhenStopped = true
-        loadingMoreIndicator.frame = CGRect(
+        loadingIndicator.hidesWhenStopped = true
+        loadingIndicator.frame = CGRect(
             x: 0,
             y: 0,
             width: tableView.bounds.width,
@@ -107,10 +106,10 @@ class ListVC: UITableViewController {
         }
     }
 
-    // Shows or hides the footer spinner used for pagination.
+    // Shows or hides the shared spinner as the footer during pagination.
     private func setLoadingMore(_ isLoading: Bool) {
-        tableView.tableFooterView = isLoading ? loadingMoreIndicator : nil
-        isLoading ? loadingMoreIndicator.startAnimating() : loadingMoreIndicator
+        tableView.tableFooterView = isLoading ? loadingIndicator : nil
+        isLoading ? loadingIndicator.startAnimating() : loadingIndicator
             .stopAnimating()
     }
 
