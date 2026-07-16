@@ -111,7 +111,7 @@ class ListVC: UITableViewController {
         setLoading(true)
         Task {
             do {
-                let pokemon =
+                loadedPokemon =
                     try await fetchPokemonList(from: ListVC.listInitialURL)
 
                 // Sleep to ensure that the loading indicator is displayed
@@ -119,7 +119,6 @@ class ListVC: UITableViewController {
                 try? await Task.sleep(for: .seconds(1))
 
                 setLoading(false)
-                loadedPokemon = pokemon
                 tableView.reloadData()
             } catch {
                 setLoading(false)
