@@ -22,7 +22,8 @@ class ListVC: UITableViewController {
         loadPokemon()
     }
 
-    // Creates the loading view used while Pokemon data is being fetched.
+    // Creates the loading view that is displayed while
+    // the initial list of Pokemon data is being fetched.
     private func configureLoadingView() {
         let loadingLabel = UILabel()
         loadingLabel.text = "Loading Pokémon"
@@ -79,7 +80,7 @@ class ListVC: UITableViewController {
     }
 
     // Loads another page when more Pokemon are available.
-    private func loadMorePokemonIfNeeded() {
+    private func loadMorePokemon() {
         guard let url = nextPageURL else { return }
 
         setLoadingMore(true)
@@ -96,7 +97,7 @@ class ListVC: UITableViewController {
         }
     }
 
-    // Shows or hides the loading indicator.
+    // Shows or hides the loading indicator in tableView.
     private func setLoading(_ isLoading: Bool) {
         tableView.backgroundView?.isHidden = !isLoading
         isLoading ?
@@ -104,8 +105,7 @@ class ListVC: UITableViewController {
             loadingIndicator.stopAnimating()
     }
 
-    // Shows or hides the loading indicator as the table footer during
-    // pagination.
+    // Shows or hides the loading indicator as the table footer.
     private func setLoadingMore(_ isLoading: Bool) {
         tableView.tableFooterView = isLoading ? loadingIndicator : nil
         isLoading ?
@@ -113,7 +113,7 @@ class ListVC: UITableViewController {
             loadingIndicator.stopAnimating()
     }
 
-    // Adds newly fetched Pokemon to the table without reloading existing rows.
+    // Adds newly fetched Pokemon to the table.
     private func appendPokemon(_ newPokemon: [Pokemon]) {
         guard !newPokemon.isEmpty else { return }
 
@@ -348,7 +348,7 @@ class ListVC: UITableViewController {
         forRowAt indexPath: IndexPath
     ) {
         guard indexPath.row == allPokemon.count - 1 else { return }
-        loadMorePokemonIfNeeded()
+        loadMorePokemon()
     }
 
     // Loads detail data and opens the detail screen for the selected Pokemon.
