@@ -138,7 +138,7 @@ class ListVC: UITableViewController {
                 let pokemon = try await fetchPokemonList(from: url)
                 appendPokemon(pokemon)
             } catch {
-                nextPageURL = nil
+                nextPageURL = nil // so we don't try again to get more
                 showError(error)
             }
         }
@@ -192,20 +192,21 @@ class ListVC: UITableViewController {
         _ tableView: UITableView,
         cellForRowAt indexPath: IndexPath
     ) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(
+        let pokemon = loadedPokemon[indexPath.row]
+        guard let cell = tableView.dequeueReusableCell(
             withIdentifier: "PokemonCell",
             for: indexPath
-        )
-        let pokemon = loadedPokemon[indexPath.row]
-        configure(cell, with: pokemon)
+        ) as? PokemonCell else {
+            return UITableViewCell()
+        }
+
+        cell.configure(with: pokemon)
         cell.accessoryType = .disclosureIndicator
 
-        if let imageURL = pokemon.imageURL,
-           let thumbnailImageView = cell.contentView.viewWithTag(1002)
-           as? UIImageView {
+        if let imageURL = pokemon.imageURL {
             loadThumbnail(
                 from: imageURL,
-                for: thumbnailImageView,
+                for: cell.thumbnailImageView,
                 in: cell,
                 pokemonID: pokemon.id
             )
@@ -214,77 +215,6 @@ class ListVC: UITableViewController {
         return cell
     }
 
-    // Applies labels, clears stale images, and lays out a Pokemon cell.
-    private func configure(_ cell: UITableViewCell, with pokemon: Pokemon) {
-        cell.contentConfiguration = nil
-
-        let idLabel: UILabel
-        let thumbnailImageView: UIImageView
-        let nameLabel: UILabel
-
-        if let existingIDLabel = cell.contentView.viewWithTag(1001) as? UILabel,
-           let existingThumbnailImageView = cell.contentView.viewWithTag(1002)
-           as? UIImageView,
-           let existingNameLabel = cell.contentView
-           .viewWithTag(1003) as? UILabel {
-            idLabel = existingIDLabel
-            thumbnailImageView = existingThumbnailImageView
-            nameLabel = existingNameLabel
-        } else {
-            idLabel = UILabel()
-            idLabel.tag = 1001
-            idLabel.font = .preferredFont(forTextStyle: .body)
-            idLabel.adjustsFontForContentSizeCategory = true
-            idLabel.setContentHuggingPriority(.required, for: .horizontal)
-
-            thumbnailImageView = UIImageView()
-            thumbnailImageView.tag = 1002
-            thumbnailImageView.contentMode = .scaleAspectFit
-            thumbnailImageView.tintColor = .secondaryLabel
-            thumbnailImageView.translatesAutoresizingMaskIntoConstraints = false
-            thumbnailImageView.widthAnchor
-                .constraint(equalToConstant: Self.rowHeight)
-                .isActive = true
-            thumbnailImageView.heightAnchor
-                .constraint(equalToConstant: Self.rowHeight)
-                .isActive = true
-
-            nameLabel = UILabel()
-            nameLabel.tag = 1003
-            nameLabel.font = .preferredFont(forTextStyle: .body)
-            nameLabel.adjustsFontForContentSizeCategory = true
-
-            let stackView = UIStackView(arrangedSubviews: [
-                idLabel,
-                thumbnailImageView,
-                nameLabel
-            ])
-            stackView.axis = .horizontal
-            stackView.alignment = .center
-            stackView.spacing = 8
-            stackView.translatesAutoresizingMaskIntoConstraints = false
-            cell.contentView.addSubview(stackView)
-
-            NSLayoutConstraint.activate([
-                stackView.leadingAnchor.constraint(
-                    equalTo: cell.contentView.layoutMarginsGuide.leadingAnchor
-                ),
-                stackView.trailingAnchor.constraint(
-                    equalTo: cell.contentView.layoutMarginsGuide.trailingAnchor
-                ),
-                stackView.topAnchor.constraint(
-                    equalTo: cell.contentView.layoutMarginsGuide.topAnchor
-                ),
-                stackView.bottomAnchor.constraint(
-                    equalTo: cell.contentView.layoutMarginsGuide.bottomAnchor
-                )
-            ])
-        }
-
-        idLabel.text = "#\(pokemon.id)"
-        thumbnailImageView.image = nil
-        nameLabel.text = pokemon.name.capitalized
-    }
 
     // Downloads a thumbnail image for a visible Pokemon cell.
     private func loadThumbnail(
