@@ -9,20 +9,6 @@ final class PokemonCell: UITableViewCell {
     private let nameLabel = UILabel()
     private var didConfigureLayout = false
 
-    override func awakeFromNib() {
-        super.awakeFromNib()
-        configureLayoutIfNeeded()
-    }
-
-    override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
-        super.init(style: style, reuseIdentifier: reuseIdentifier)
-        configureLayoutIfNeeded()
-    }
-
-    required init?(coder: NSCoder) {
-        super.init(coder: coder)
-    }
-
     func configure(with pokemon: Pokemon) {
         configureLayoutIfNeeded()
         contentConfiguration = nil
@@ -58,8 +44,10 @@ final class PokemonCell: UITableViewCell {
         contentView.addSubview(stackView)
 
         NSLayoutConstraint.activate([
-            thumbnailImageView.widthAnchor.constraint(equalToConstant: Self.thumbnailSize),
-            thumbnailImageView.heightAnchor.constraint(equalToConstant: Self.thumbnailSize),
+            thumbnailImageView.widthAnchor
+                .constraint(equalToConstant: Self.thumbnailSize),
+            thumbnailImageView.heightAnchor
+                .constraint(equalToConstant: Self.thumbnailSize),
             stackView.leadingAnchor.constraint(
                 equalTo: contentView.layoutMarginsGuide.leadingAnchor
             ),
