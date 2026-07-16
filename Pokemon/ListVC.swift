@@ -55,29 +55,23 @@ class ListVC: UITableViewController {
         tableView.backgroundView = loadingStack
     }
 
-    // Shows or hides the initial loading indicator.
-    private func setLoading(_ isLoading: Bool) {
-        tableView.backgroundView?.isHidden = !isLoading
-        isLoading ? loadingIndicator.startAnimating() : loadingIndicator
-            .stopAnimating()
-    }
-
     // Loads the first page of Pokemon and refreshes the table.
     private func loadPokemon() {
         setLoading(true)
         Task {
             do {
                 let page =
-                    try await fetchPokemonPage(
-                        from: ListVC.listInitialURL
-                    )
+                    try await fetchPokemonPage(from: ListVC.listInitialURL)
+
+                // Sleep to ensure that the loading indicator is displayed
+                // even if the data is fetched quickly.
                 try? await Task.sleep(for: .seconds(1))
+
                 setLoading(false)
                 nextPageURL = page.nextPageURL
                 allPokemon = page.pokemon
                 tableView.reloadData()
             } catch {
-                try? await Task.sleep(for: .seconds(0.5))
                 setLoading(false)
                 showError(error)
             }
@@ -88,11 +82,9 @@ class ListVC: UITableViewController {
     private func loadMorePokemonIfNeeded() {
         guard let url = nextPageURL else { return }
 
-        // nextPageURL = nil
         setLoadingMore(true)
         Task {
             defer { setLoadingMore(false) }
-
             do {
                 let page = try await fetchPokemonPage(from: url)
                 nextPageURL = page.nextPageURL
@@ -104,11 +96,21 @@ class ListVC: UITableViewController {
         }
     }
 
-    // Shows or hides the shared spinner as the footer during pagination.
+    // Shows or hides the loading indicator.
+    private func setLoading(_ isLoading: Bool) {
+        tableView.backgroundView?.isHidden = !isLoading
+        isLoading ?
+            loadingIndicator.startAnimating() :
+            loadingIndicator.stopAnimating()
+    }
+
+    // Shows or hides the loading indicator as the table footer during
+    // pagination.
     private func setLoadingMore(_ isLoading: Bool) {
         tableView.tableFooterView = isLoading ? loadingIndicator : nil
-        isLoading ? loadingIndicator.startAnimating() : loadingIndicator
-            .stopAnimating()
+        isLoading ?
+            loadingIndicator.startAnimating() :
+            loadingIndicator.stopAnimating()
     }
 
     // Adds newly fetched Pokemon to the table without reloading existing rows.
