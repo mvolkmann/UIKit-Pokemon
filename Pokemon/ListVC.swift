@@ -1,11 +1,10 @@
 import UIKit
 
 class ListVC: UITableViewController {
-    private static let pageSize = 100
     private static let listBaseURL =
         URL(string: "https://pokeapi.co/api/v2/pokemon")!
     private static let listInitialURL =
-        URL(string: "\(listBaseURL)?limit=\(ListVC.pageSize)")!
+        URL(string: "\(listBaseURL)?limit=100")!
 
     private let loadingIndicator = UIActivityIndicatorView(style: .large)
     private let loadingMoreIndicator = UIActivityIndicatorView(style: .medium)
