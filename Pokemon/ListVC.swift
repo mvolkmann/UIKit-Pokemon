@@ -17,7 +17,7 @@ class ListVC: UITableViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         title = "Pokémon" // displayed at top of table
-        tableView.rowHeight = 68
+        tableView.rowHeight = Self.rowHeight + 12 // padding
         configureLoadingView()
         loadPokemon()
     }
