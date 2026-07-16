@@ -206,7 +206,6 @@ class ListVC: UITableViewController {
         if let imageURL = pokemon.imageURL {
             loadThumbnail(
                 from: imageURL,
-                for: cell.thumbnailImageView,
                 in: cell,
                 pokemonID: pokemon.id
             )
@@ -218,11 +217,10 @@ class ListVC: UITableViewController {
     // Downloads a thumbnail image for a Pokemon cell.
     private func loadThumbnail(
         from url: URL,
-        for thumbnailImageView: UIImageView,
-        in cell: UITableViewCell,
+        in cell: PokemonCell,
         pokemonID: String
     ) {
-        Task { [weak self, weak thumbnailImageView, weak cell] in
+        Task {
             let image: UIImage?
 
             do {
@@ -239,16 +237,11 @@ class ListVC: UITableViewController {
             }
 
             await MainActor.run {
-                guard let self,
-                      let thumbnailImageView,
-                      let cell,
-                      let indexPath = self.tableView.indexPath(for: cell),
-                      self.loadedPokemon.indices.contains(indexPath.row),
-                      self.loadedPokemon[indexPath.row].id == pokemonID else {
+                guard let indexPath = tableView.indexPath(for: cell),
+                      loadedPokemon[indexPath.row].id == pokemonID else {
                     return
                 }
-
-                thumbnailImageView.image = image
+                cell.thumbnailImageView.image = image
             }
         }
     }
