@@ -9,7 +9,7 @@ class ListVC: UITableViewController {
 
     private let loadingIndicator = UIActivityIndicatorView(style: .large)
 
-    private var allPokemon: [Pokemon] = []
+    private var loadedPokemon: [Pokemon] = []
     private var nextPageURL: URL?
     private var selectedPokemon: Pokemon?
 
@@ -19,7 +19,20 @@ class ListVC: UITableViewController {
         title = "Pokémon" // displayed at top of table
         tableView.rowHeight = Self.rowHeight + 12 // padding
         configureLoadingView()
-        loadPokemon()
+        loadInitialPokemon()
+    }
+
+    // Adds newly fetched Pokemon to the table view.
+    private func appendPokemon(_ newPokemon: [Pokemon]) {
+        guard !newPokemon.isEmpty else { return }
+
+        let startIndex = loadedPokemon.count
+        loadedPokemon.append(contentsOf: newPokemon)
+
+        let indexPaths = (startIndex ..< loadedPokemon.count).map {
+            IndexPath(row: $0, section: 0)
+        }
+        tableView.insertRows(at: indexPaths, with: .automatic)
     }
 
     // Creates the loading view that is displayed while
@@ -56,78 +69,8 @@ class ListVC: UITableViewController {
         tableView.backgroundView = loadingStack
     }
 
-    // Loads the first page of Pokemon and refreshes the table.
-    private func loadPokemon() {
-        setLoading(true)
-        Task {
-            do {
-                let page =
-                    try await fetchPokemonPage(from: ListVC.listInitialURL)
-
-                // Sleep to ensure that the loading indicator is displayed
-                // even if the data is fetched quickly.
-                try? await Task.sleep(for: .seconds(1))
-
-                setLoading(false)
-                nextPageURL = page.nextPageURL
-                allPokemon = page.pokemon
-                tableView.reloadData()
-            } catch {
-                setLoading(false)
-                showError(error)
-            }
-        }
-    }
-
-    // Loads another page when more Pokemon are available.
-    private func loadMorePokemon() {
-        guard let url = nextPageURL else { return }
-
-        setLoadingMore(true)
-        Task {
-            defer { setLoadingMore(false) }
-            do {
-                let page = try await fetchPokemonPage(from: url)
-                nextPageURL = page.nextPageURL
-                appendPokemon(page.pokemon)
-            } catch {
-                nextPageURL = nil
-                showError(error)
-            }
-        }
-    }
-
-    // Shows or hides the loading indicator in tableView.
-    private func setLoading(_ isLoading: Bool) {
-        tableView.backgroundView?.isHidden = !isLoading
-        isLoading ?
-            loadingIndicator.startAnimating() :
-            loadingIndicator.stopAnimating()
-    }
-
-    // Shows or hides the loading indicator as the table footer.
-    private func setLoadingMore(_ isLoading: Bool) {
-        tableView.tableFooterView = isLoading ? loadingIndicator : nil
-        isLoading ?
-            loadingIndicator.startAnimating() :
-            loadingIndicator.stopAnimating()
-    }
-
-    // Adds newly fetched Pokemon to the table.
-    private func appendPokemon(_ newPokemon: [Pokemon]) {
-        guard !newPokemon.isEmpty else { return }
-
-        let startIndex = allPokemon.count
-        allPokemon.append(contentsOf: newPokemon)
-
-        let indexPaths = (startIndex ..< allPokemon.count).map {
-            IndexPath(row: $0, section: 0)
-        }
-        tableView.insertRows(at: indexPaths, with: .automatic)
-    }
-
-    // Fetches and decodes one paged response from the Pokemon API.
-    private func fetchPokemonPage(from url: URL) async throws -> (
+    // Fetches and decodes a paged response from the Pokemon API.
+    private func fetchPokemonList(from url: URL) async throws -> (
         pokemon: [Pokemon],
         nextPageURL: URL?
     ) {
@@ -162,15 +105,64 @@ class ListVC: UITableViewController {
         return detail
     }
 
-    // Confirms that a URL response has a successful HTTP status code.
-    private static func validate(_ response: URLResponse) throws {
-        guard let httpResponse = response as? HTTPURLResponse,
-              (200 ... 299).contains(httpResponse.statusCode) else {
-            throw URLError(.badServerResponse)
+    // Loads the first page of Pokemon and refreshes the table.
+    private func loadInitialPokemon() {
+        setLoading(true)
+        Task {
+            do {
+                let page =
+                    try await fetchPokemonList(from: ListVC.listInitialURL)
+
+                // Sleep to ensure that the loading indicator is displayed
+                // even if the data is fetched quickly.
+                try? await Task.sleep(for: .seconds(1))
+
+                setLoading(false)
+                nextPageURL = page.nextPageURL
+                loadedPokemon = page.pokemon
+                tableView.reloadData()
+            } catch {
+                setLoading(false)
+                showError(error)
+            }
         }
     }
 
-    // Presents a simple alert for loading or decoding failures.
+    // Loads more Pokemon if available.
+    private func loadMorePokemon() {
+        guard let url = nextPageURL else { return }
+
+        setLoadingMore(true)
+        Task {
+            defer { setLoadingMore(false) }
+            do {
+                let page = try await fetchPokemonList(from: url)
+                nextPageURL = page.nextPageURL
+                appendPokemon(page.pokemon)
+            } catch {
+                nextPageURL = nil
+                showError(error)
+            }
+        }
+    }
+
+    // Shows or hides the loading indicator in tableView.
+    private func setLoading(_ isLoading: Bool) {
+        tableView.backgroundView?.isHidden = !isLoading
+        isLoading ?
+            loadingIndicator.startAnimating() :
+            loadingIndicator.stopAnimating()
+    }
+
+    // Shows or hides the loading indicator as the table footer.
+    private func setLoadingMore(_ isLoading: Bool) {
+        tableView.tableFooterView = isLoading ? loadingIndicator : nil
+        isLoading ?
+            loadingIndicator.startAnimating() :
+            loadingIndicator.stopAnimating()
+    }
+
+    // Displays an alert that describes an error.
     private func showError(_ error: Error) {
         let alert = UIAlertController(
             title: "Unable to Load Pokemon",
@@ -181,12 +173,20 @@ class ListVC: UITableViewController {
         present(alert, animated: true)
     }
 
+    // Confirms that a URL response has a successful HTTP status code.
+    private static func validate(_ response: URLResponse) throws {
+        guard let httpResponse = response as? HTTPURLResponse,
+              (200 ... 299).contains(httpResponse.statusCode) else {
+            throw URLError(.badServerResponse)
+        }
+    }
+
     // Returns the number of Pokemon rows currently loaded.
     override func tableView(
         _ tableView: UITableView,
         numberOfRowsInSection section: Int
     ) -> Int {
-        allPokemon.count
+        loadedPokemon.count
     }
 
     // Creates and configures a table cell for a Pokemon row.
@@ -198,7 +198,7 @@ class ListVC: UITableViewController {
             withIdentifier: "PokemonCell",
             for: indexPath
         )
-        let pokemon = allPokemon[indexPath.row]
+        let pokemon = loadedPokemon[indexPath.row]
         configure(cell, with: pokemon)
         cell.accessoryType = .disclosureIndicator
 
@@ -333,8 +333,8 @@ class ListVC: UITableViewController {
         guard let thumbnailImageView,
               let cell,
               let indexPath = tableView.indexPath(for: cell),
-              allPokemon.indices.contains(indexPath.row),
-              allPokemon[indexPath.row].id == pokemonID else {
+              loadedPokemon.indices.contains(indexPath.row),
+              loadedPokemon[indexPath.row].id == pokemonID else {
             return
         }
 
@@ -347,7 +347,7 @@ class ListVC: UITableViewController {
         willDisplay cell: UITableViewCell,
         forRowAt indexPath: IndexPath
     ) {
-        guard indexPath.row == allPokemon.count - 1 else { return }
+        guard indexPath.row == loadedPokemon.count - 1 else { return }
         loadMorePokemon()
     }
 
@@ -356,7 +356,7 @@ class ListVC: UITableViewController {
         _ tableView: UITableView,
         didSelectRowAt indexPath: IndexPath
     ) {
-        let aPokemon = allPokemon[indexPath.row]
+        let aPokemon = loadedPokemon[indexPath.row]
 
         Task {
             do {
