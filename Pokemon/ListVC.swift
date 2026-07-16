@@ -288,7 +288,7 @@ class ListVC: UITableViewController {
         return selectedPokemon != nil
     }
 
-    // Passes the selected Pokemon to the destination detail view controller.
+    // Passes the selected Pokemon to the detail view controller.
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         guard segue.identifier == "ShowPokemonDetail",
               let detailViewController = segue
