@@ -83,6 +83,7 @@ struct Pokemon {
     }
 }
 
+// Matches JSON returned for a specific Pokemon.
 struct PokemonDetailResponse: Decodable {
     let types: [String]
     let height: Int
@@ -105,7 +106,8 @@ struct PokemonDetailResponse: Decodable {
         let name: String
     }
 
-    // Sets the types property from Pokemon detail JSON data.
+    // Sets the types, height, and width properties
+    // from Pokemon detail JSON data.
     init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         let typeSlots = try container.decode([TypeSlot].self, forKey: .types)
