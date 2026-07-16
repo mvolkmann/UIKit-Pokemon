@@ -141,9 +141,9 @@ class ListVC: UITableViewController {
         )
     }
 
-    // Fetches the type names for a single Pokemon.
-    private func fetchPokemonTypes(for pokemon: Pokemon) async throws
-        -> [String] {
+    // Fetches detail data for a single Pokemon.
+    private func fetchPokemonDetail(for pokemon: Pokemon) async throws
+        -> PokemonDetailResponse {
         let detailURL = pokemonListBaseURL.appendingPathComponent(
             "\(pokemon.id)"
         )
@@ -154,7 +154,7 @@ class ListVC: UITableViewController {
             PokemonDetailResponse.self,
             from: data
         )
-        return detail.types
+        return detail
     }
 
     // Builds a paged list URL for the requested offset.
@@ -384,8 +384,8 @@ class ListVC: UITableViewController {
 
         Task {
             do {
-                let types = try await fetchPokemonTypes(for: aPokemon)
-                selectedPokemon = aPokemon.withTypes(types)
+                let detail = try await fetchPokemonDetail(for: aPokemon)
+                selectedPokemon = aPokemon.withDetail(detail)
                 performSegue(withIdentifier: "ShowPokemonDetail", sender: self)
             } catch {
                 showError(error)

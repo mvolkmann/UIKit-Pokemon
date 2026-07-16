@@ -3,6 +3,8 @@ import UIKit
 class DetailVC: UIViewController {
     @IBOutlet private var imageView: UIImageView!
     @IBOutlet private var typesLabel: UILabel!
+    @IBOutlet private var heightLabel: UILabel!
+    @IBOutlet private var weightLabel: UILabel!
 
     var pokemon: Pokemon?
 
@@ -12,12 +14,14 @@ class DetailVC: UIViewController {
         configureView()
     }
 
-    // Displays the selected Pokemon name, types, and image placeholder.
+    // Displays the selected Pokemon image and detail data.
     private func configureView() {
         guard let pokemon else { return }
 
         title = pokemon.name.capitalized
         typesLabel.text = pokemon.typeNames
+        heightLabel.text = pokemon.heightDescription
+        weightLabel.text = pokemon.weightDescription
         imageView.image = UIImage(systemName: "photo")
         imageView.tintColor = .secondaryLabel
 

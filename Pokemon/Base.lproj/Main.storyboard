@@ -72,22 +72,66 @@
                                     </label>
                                 </subviews>
                             </stackView>
+                            <stackView opaque="NO" contentMode="scaleToFill" alignment="center" spacing="8" translatesAutoresizingMaskIntoConstraints="NO" id="height-row-001">
+                                <rect key="frame" x="137.33333333333334" y="649" width="118.33333333333331" height="24"/>
+                                <subviews>
+                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Height:" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontForContentSizeCategory="YES" translatesAutoresizingMaskIntoConstraints="NO" id="height-title-001">
+                                        <rect key="frame" x="0.0" y="0.0" width="65" height="24"/>
+                                        <fontDescription key="fontDescription" style="UICTFontTextStyleTitle3"/>
+                                        <nil key="textColor"/>
+                                        <nil key="highlightedColor"/>
+                                    </label>
+                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Height" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontForContentSizeCategory="YES" translatesAutoresizingMaskIntoConstraints="NO" id="height-001">
+                                        <rect key="frame" x="73" y="0.0" width="45.333333333333343" height="24"/>
+                                        <fontDescription key="fontDescription" style="UICTFontTextStyleTitle3"/>
+                                        <color key="textColor" systemColor="secondaryLabelColor"/>
+                                        <nil key="highlightedColor"/>
+                                    </label>
+                                </subviews>
+                            </stackView>
+                            <stackView opaque="NO" contentMode="scaleToFill" alignment="center" spacing="8" translatesAutoresizingMaskIntoConstraints="NO" id="weight-row-001">
+                                <rect key="frame" x="136.33333333333334" y="685" width="120.33333333333331" height="24"/>
+                                <subviews>
+                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Weight:" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontForContentSizeCategory="YES" translatesAutoresizingMaskIntoConstraints="NO" id="weight-title-001">
+                                        <rect key="frame" x="0.0" y="0.0" width="65" height="24"/>
+                                        <fontDescription key="fontDescription" style="UICTFontTextStyleTitle3"/>
+                                        <nil key="textColor"/>
+                                        <nil key="highlightedColor"/>
+                                    </label>
+                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Weight" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontForContentSizeCategory="YES" translatesAutoresizingMaskIntoConstraints="NO" id="weight-001">
+                                        <rect key="frame" x="73" y="0.0" width="47.333333333333343" height="24"/>
+                                        <fontDescription key="fontDescription" style="UICTFontTextStyleTitle3"/>
+                                        <color key="textColor" systemColor="secondaryLabelColor"/>
+                                        <nil key="highlightedColor"/>
+                                    </label>
+                                </subviews>
+                            </stackView>
                         </subviews>
                         <viewLayoutGuide key="safeArea" id="safe-detail-001"/>
                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                         <constraints>
                             <constraint firstItem="image-001" firstAttribute="centerX" secondItem="safe-detail-001" secondAttribute="centerX" id="image-center-001"/>
                             <constraint firstItem="image-001" firstAttribute="top" secondItem="safe-detail-001" secondAttribute="top" constant="24" id="image-top-001"/>
+                            <constraint firstItem="height-row-001" firstAttribute="centerX" secondItem="safe-detail-001" secondAttribute="centerX" id="height-row-center-001"/>
+                            <constraint firstItem="height-row-001" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="safe-detail-001" secondAttribute="leading" constant="24" id="height-row-leading-001"/>
+                            <constraint firstItem="height-row-001" firstAttribute="top" secondItem="type-row-001" secondAttribute="bottom" constant="12" id="height-row-top-001"/>
+                            <constraint firstItem="safe-detail-001" firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="height-row-001" secondAttribute="trailing" constant="24" id="height-row-trailing-001"/>
                             <constraint firstItem="type-row-001" firstAttribute="centerX" secondItem="safe-detail-001" secondAttribute="centerX" id="type-row-center-001"/>
                             <constraint firstItem="type-row-001" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="safe-detail-001" secondAttribute="leading" constant="24" id="type-row-leading-001"/>
                             <constraint firstItem="type-row-001" firstAttribute="top" secondItem="image-001" secondAttribute="bottom" constant="24" id="type-row-top-001"/>
                             <constraint firstItem="safe-detail-001" firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="type-row-001" secondAttribute="trailing" constant="24" id="type-row-trailing-001"/>
+                            <constraint firstItem="weight-row-001" firstAttribute="centerX" secondItem="safe-detail-001" secondAttribute="centerX" id="weight-row-center-001"/>
+                            <constraint firstItem="weight-row-001" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="safe-detail-001" secondAttribute="leading" constant="24" id="weight-row-leading-001"/>
+                            <constraint firstItem="weight-row-001" firstAttribute="top" secondItem="height-row-001" secondAttribute="bottom" constant="12" id="weight-row-top-001"/>
+                            <constraint firstItem="safe-detail-001" firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="weight-row-001" secondAttribute="trailing" constant="24" id="weight-row-trailing-001"/>
                         </constraints>
                     </view>
                     <navigationItem key="navigationItem" title="Pokemon Detail" id="nav-item-detail"/>
                     <connections>
+                        <outlet property="heightLabel" destination="height-001" id="outlet-height-001"/>
                         <outlet property="imageView" destination="image-001" id="outlet-image-001"/>
                         <outlet property="typesLabel" destination="types-001" id="outlet-types-001"/>
+                        <outlet property="weightLabel" destination="weight-001" id="outlet-weight-001"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="first-detail" sceneMemberID="firstResponder"/>

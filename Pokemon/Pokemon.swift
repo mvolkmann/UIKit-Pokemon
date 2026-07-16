@@ -23,12 +23,22 @@ struct Pokemon {
     // there's no benefit to converting the String values to Int values.
     let id: String
     let name: String
-    let types: [String] // loaded by detail request; see withTypes method
+    let types: [String] // loaded by detail request; see withDetail method
+    let height: Int // loaded by detail request; unit is decimeters
+    let weight: Int // loaded by detail request; unit is hectograms
 
-    init(id: String, name: String, types: [String] = []) {
+    init(
+        id: String,
+        name: String,
+        types: [String] = [],
+        height: Int = 0,
+        weight: Int = 0
+    ) {
         self.id = id
         self.name = name
         self.types = types
+        self.height = height
+        self.weight = weight
     }
 
     init?(item: PokemonItem) {
@@ -50,19 +60,39 @@ struct Pokemon {
         types.map { $0.capitalized }.joined(separator: ", ")
     }
 
+    var heightDescription: String {
+        guard height > 0 else { return "unknown" }
+        return "\(height * 10) cm"
+    }
+
+    var weightDescription: String {
+        guard weight > 0 else { return "unknown" }
+        return "\(Double(weight) / 10.0) kg"
+    }
+
     // Creates a new instance of the Pokemon struct
-    // whose types property is set.
-    func withTypes(_ types: [String]) -> Pokemon {
-        Pokemon(id: id, name: name, types: types)
+    // whose detail properties are set.
+    func withDetail(_ detail: PokemonDetailResponse) -> Pokemon {
+        Pokemon(
+            id: id,
+            name: name,
+            types: detail.types,
+            height: detail.height,
+            weight: detail.weight
+        )
     }
 }
 
 struct PokemonDetailResponse: Decodable {
-    let types: [String] // only property in the response we care about
+    let types: [String]
+    let height: Int
+    let weight: Int
 
     // Used in JSON decoding.
     private enum CodingKeys: CodingKey {
         case types
+        case height
+        case weight
     }
 
     // Used in JSON decoding.
@@ -80,5 +110,7 @@ struct PokemonDetailResponse: Decodable {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         let typeSlots = try container.decode([TypeSlot].self, forKey: .types)
         types = typeSlots.map { $0.type.name }
+        height = try container.decode(Int.self, forKey: .height)
+        weight = try container.decode(Int.self, forKey: .weight)
     }
 }
